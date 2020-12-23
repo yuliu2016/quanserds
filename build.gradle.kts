@@ -31,7 +31,8 @@ buildConfig {
 }
 
 application {
-    mainClassName = "ca.warp7.rt.view.aads.Main"
+    mainModule.set("quanserds")
+    mainClass.set("ca.warp7.rt.view.aads.Main")
 }
 
 tasks.test {
@@ -82,7 +83,7 @@ dependencies {
 
 jlink {
     launcher {
-        jvmArgs = listOf("--add-reads", "quanserds.merged.module=quanserds")
+//        jvmArgs = listOf("--add-reads", "quanserds.merged.module=quanserds")
     }
     options.addAll("--strip-debug", "--no-header-files", "--no-man-pages")
 }
