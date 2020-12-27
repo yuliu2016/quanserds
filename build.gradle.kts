@@ -86,4 +86,11 @@ jlink {
 //        jvmArgs = listOf("--add-reads", "quanserds.merged.module=quanserds")
     }
     options.addAll("--strip-debug", "--no-header-files", "--no-man-pages")
+
+    /*
+    jpackage --verbose --type=msi --win-dir-chooser --win-menu --win-menu-group "Quanser Tools"
+    --win-per-user-install --win-shortcut --win-upgrade-uuid "7752b28a-94ea-4b4a-8b65-9f31923ac83a"
+    --java-options "--add-reads merged.module=quanserds" --app-version 20.3.2 --name "Quanser Driver
+    Station" --icon icon.ico --runtime-image image --module quanserds/io.quanserds.Main
+     */
 }
