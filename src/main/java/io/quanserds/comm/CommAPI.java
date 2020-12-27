@@ -1,5 +1,8 @@
 package io.quanserds.comm;
 
+import io.quanserds.comm.struct.QArmGripperObject;
+import io.quanserds.comm.struct.QArmGripperState;
+import io.quanserds.comm.struct.QArmState;
 import io.quanserds.comm.struct.WorldTransform;
 
 import java.nio.ByteBuffer;
@@ -114,6 +117,20 @@ public class CommAPI {
         return bb.array();
     }
 
+    private static float unpackFloat(byte[] payload) {
+        if (payload.length == 4) {
+            ByteBuffer bb = ByteBuffer.wrap(payload);
+            bb.order(ByteOrder.BIG_ENDIAN);
+            return bb.getFloat();
+        } else {
+            return 0f;
+        }
+    }
+
+    private static float unpackFloat(ModularContainer container) {
+        return unpackFloat(container.getPayload());
+    }
+
     public static ModularContainer common_RequestPing(int deviceID, int deviceNumber) {
         return container(deviceID, deviceNumber, FCN_REQUEST_PING, new byte[0]);
     }
@@ -169,4 +186,33 @@ public class CommAPI {
     public static ModularContainer qarm_RequestGripperObjectProperties(int deviceNumber) {
         return container(ID_QARM, deviceNumber, FCN_QARM_REQUEST_GRIPPER_OBJECT_PROPERTIES, new byte[0]);
     }
+
+    public QArmState qarm_ResponseState(ModularContainer container) {
+        return QArmState.fromPayload(container.getPayload());
+    }
+
+    public float qarm_ResponseBase(ModularContainer container) {
+        return unpackFloat(container);
+    }
+
+    public float qarm_ResponseShoulder(ModularContainer container) {
+        return unpackFloat(container);
+    }
+
+    public float qarm_ResponseElbow(ModularContainer container) {
+        return unpackFloat(container);
+    }
+
+    public float qarm_ResponseWrist(ModularContainer container) {
+        return unpackFloat(container);
+    }
+
+    public QArmGripperState qarm_ResponseGripper(ModularContainer container) {
+        return QArmGripperState.fromPayload(container.getPayload());
+    }
+
+    public QArmGripperObject qarm_ResponseGripperObjectProperties(ModularContainer container) {
+        return QArmGripperObject.fromPayload(container.getPayload());
+    }
+
 }
