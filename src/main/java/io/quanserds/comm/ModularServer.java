@@ -13,9 +13,11 @@ public class ModularServer implements AutoCloseable {
 
     private final byte[] readBuffer = new byte[BUFFER_SIZE];
     private byte[] sendBuffer = new byte[0];
-    private byte[] receivePacketBuffer = new byte[0];
-    private int receivePacketSize = 0;
-    private int receivePacketContainerIndex = 0;
+
+    // Packet data
+    private byte[] packetBuffer = new byte[0];
+    private int packetSize = 0;
+    private int packetIndex = 0;
 
     private final Stream serverStream;
 
@@ -92,44 +94,44 @@ public class ModularServer implements AutoCloseable {
         boolean newData = false;
 
         while (bytesRead > 0) {
-            receivePacketBuffer = join(receivePacketBuffer, readBuffer, bytesRead);
+            packetBuffer = join(packetBuffer, readBuffer, bytesRead);
             // while we're here, check if there are any more bytes in the receive buffer
             bytesRead = serverStream.receive();
         }
 
         // check if we already have data in the receive buffer that was unprocessed
         // (multiple packets in a single receive)
-        if (receivePacketBuffer.length > 5) {
-            if (receivePacketBuffer[4] == MAGIC_BYTE) {
+        if (packetBuffer.length > 5) {
+            if (packetBuffer[4] == MAGIC_BYTE) {
                 // packet size
-                ByteBuffer bb = ByteBuffer.wrap(receivePacketBuffer);
+                ByteBuffer bb = ByteBuffer.wrap(packetBuffer);
                 bb.order(ByteOrder.LITTLE_ENDIAN);
                 // add the 4 bytes for the size to the packet size
-                receivePacketSize = bb.getInt() + 4;
+                packetSize = bb.getInt() + 4;
 
-                if (receivePacketBuffer.length >= receivePacketSize) {
-                    receivePacketContainerIndex = 5;
+                if (packetBuffer.length >= packetSize) {
+                    packetIndex = 5;
                     newData = true;
                 }
             } else {
                 System.out.println("Error parsing multiple packets in receive buffer. " +
                         " Clearing internal buffers.");
-                receivePacketBuffer = new byte[0];
+                packetBuffer = new byte[0];
             }
         }
         return newData;
     }
 
     public List<ModularContainer> getReceivedContainers() {
-        if (receivePacketContainerIndex <= 0) {
+        if (packetIndex <= 0) {
             return Collections.emptyList();
         }
         List<ModularContainer> containers = new ArrayList<>();
-        ByteBuffer bb = ByteBuffer.wrap(receivePacketBuffer);
-        bb.position(receivePacketContainerIndex);
+        ByteBuffer bb = ByteBuffer.wrap(packetBuffer);
+        bb.position(packetIndex);
         bb.order(ByteOrder.BIG_ENDIAN);
 
-        while (receivePacketContainerIndex < receivePacketSize) {
+        while (packetIndex < packetSize) {
             int containerSize = bb.getInt(); // Originally: unsigned int
             int deviceID = bb.getInt(); // Originally: unsigned int
             int deviceNumber = bb.get();
@@ -141,20 +143,20 @@ public class ModularServer implements AutoCloseable {
                     of(containerSize, deviceID, deviceNumber,deviceFunction,payload);
 
             containers.add(container);
-            receivePacketContainerIndex += containerSize;
+            packetIndex += containerSize;
         }
 
-        if (receivePacketBuffer.length == receivePacketSize) {
+        if (packetBuffer.length == packetSize) {
             // The data buffer contains only the one packet.  Clear the buffer.
-            receivePacketBuffer = new byte[0];
+            packetBuffer = new byte[0];
         } else {
             // Remove the packet from the data buffer.
             // There is another packet in the buffer already.
-            receivePacketBuffer = Arrays.copyOfRange(receivePacketBuffer,
-                    receivePacketContainerIndex, receivePacketBuffer.length);
+            packetBuffer = Arrays.copyOfRange(packetBuffer,
+                    packetIndex, packetBuffer.length);
         }
 
-        receivePacketContainerIndex = 0;
+        packetIndex = 0;
 
         return containers;
     }
