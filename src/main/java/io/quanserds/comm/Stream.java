@@ -13,26 +13,31 @@ public class Stream implements AutoCloseable {
 
     // https://www.baeldung.com/java-nio2-async-socket-channel
 
-    private final AsynchronousServerSocketChannel serverChannel;
-    private final Future<AsynchronousSocketChannel> acceptFuture;
+    private AsynchronousServerSocketChannel serverChannel;
+    private Future<AsynchronousSocketChannel> acceptFuture;
 
     private AsynchronousSocketChannel clientChannel;
     private Future<Integer> readFuture = null;
 
     private final ByteBuffer readBuffer;
 
-    public Stream(int port, byte[] buffer) throws IOException {
-        var localhost = InetAddress.getByName("localhost");
-
-        serverChannel = AsynchronousServerSocketChannel.open();
-        serverChannel.bind(new InetSocketAddress(localhost, port));
+    public Stream(int port, byte[] buffer) {
+        try {
+            var localhost = InetAddress.getByName("localhost");
+            serverChannel = AsynchronousServerSocketChannel.open();
+            serverChannel.bind(new InetSocketAddress(localhost, port));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
         acceptFuture = serverChannel.accept();
-
         readBuffer = ByteBuffer.wrap(buffer);
     }
 
     public boolean poll(int timeoutSeconds) {
+        if (clientChannel != null) {
+            return false;
+        }
         try {
             clientChannel = acceptFuture.get(timeoutSeconds, TimeUnit.SECONDS);
             boolean accepted = clientChannel != null && clientChannel.isOpen();
@@ -46,16 +51,37 @@ public class Stream implements AutoCloseable {
         }
     }
 
-    public void stop() throws IOException {
-        if (clientChannel != null) {
-            clientChannel.close();
+    public void stop() {
+        try {
+            if (clientChannel != null && clientChannel.isOpen()) {
+                clientChannel.close();
+                clientChannel = null;
+            }
+            serverChannel.close();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
-        serverChannel.close();
+    }
+
+    public void reconnect() {
+        if (clientChannel != null && clientChannel.isOpen()) {
+            try {
+                clientChannel.close();
+                clientChannel = null;
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        acceptFuture = serverChannel.accept();
+    }
+
+    public void send(ByteBuffer buffer) {
+        // Doesn't actually check if it worked or not
+        clientChannel.write(buffer);
     }
 
     public void send(byte[] data) {
-        // Doesn't actually check if it worked or not
-        clientChannel.write(ByteBuffer.wrap(data));
+        send(ByteBuffer.wrap(data));
     }
 
     public int receive() {
