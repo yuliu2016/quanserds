@@ -40,6 +40,8 @@ public class QArm {
     private float object_mass = 0f;
     private String object_properties = "";
 
+    private QArmGripperObject gripper_object = null;
+
     private void updateArmState() {
         // Fetch until new data is received from simulation
         int count = 0;
@@ -97,6 +99,7 @@ public class QArm {
 
             case FCN_QARM_RESPONSE_GRIPPER_OBJECT_PROPERTIES:
                 QArmGripperObject p = qarm_ResponseGripperObjectProperties(container);
+                gripper_object = p;
                 object_id = p.object_id;
                 object_mass = p.mass;
                 object_properties = p.properties;
@@ -150,43 +153,13 @@ public class QArm {
         comms.postMail(qarm_CommandGripper(device_num, (float) gripper)).deliver();
     }
 
-    // Manipulator parameters in meters:
-    private static final double _L1 = 0.127;
-    private static final double _L2 = 0.3556;
-    private static final double _L3 = 0.4064;
-
-    // Define joint angle (in rads) and gripper limits
-    private static final double _base_upper_lim = 3.05;
-    private static final double _base_lower_lim = -3.05;
-    private static final double _shoulder_upper_limit = 1.57;
-    private static final double _shoulder_lower_limit = -1.57;
-    private static final double _elbow_upper_limit = 1.57;
-    private static final double _elbow_lower_limit = -1.39;
-    private static final double _wrist_upper_limit = 2.96;
-    private static final double _wrist_lower_limit = -2.96;
-    private static final double _gripper_upper_limit = 1;
-    private static final double _gripper_lower_limit = 0;
-
-    public boolean anglesWithinBound(
-            double base, double shoulder, double elbow, double wrist, double gripper) {
-        // Check if given joint angles and gripper value are within acceptable limit
-        return !(base > _base_upper_lim || base < _base_lower_lim ||
-                shoulder > _shoulder_upper_limit || shoulder < _shoulder_lower_limit ||
-                elbow > _elbow_upper_limit || elbow < _elbow_lower_limit ||
-                wrist > _wrist_upper_limit || wrist < _wrist_lower_limit ||
-                gripper > _gripper_upper_limit || gripper < _gripper_lower_limit);
+    public QArmGripperObject getGripperObjectProperties() {
+        comms.postMail(qarm_RequestGripperObjectProperties(device_num)).deliver();
+        updateArmState();
+        return gripper_object;
     }
 
-    public boolean coordinatesWithinBound(double x, double y, double z) {
-        double R = Math.hypot(x, y);
-
-        // Vertical offset within the verical plane from Frame 1 to End-Effector
-        // Note: Frame 1 y-axis points downward (negative global Z-axis direction)
-        double Z = _L1 - z;
-
-        // Distance from Frame 1 to End-Effector Frame
-        double Lambda = Math.hypot(R, Z);
-
-        return !(Lambda > (_L2 + _L3) || z < 0);
+    public void ping() {
+        comms.postMail(common_RequestPing(ID_QARM, 0)).deliver();
     }
 }

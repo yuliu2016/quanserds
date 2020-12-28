@@ -1,9 +1,11 @@
-package io.quanserds.comm.struct;
+package io.quanserds.comm.math;
+
+import java.util.Arrays;
 
 public class Matrix44 {
     private final double[] M;
 
-    public Matrix44(double[] m) {
+    public Matrix44(double... m) {
         if (m.length != 16) {
             throw new IllegalArgumentException();
         }
@@ -35,5 +37,18 @@ public class Matrix44 {
 
     public double get(int row, int col) {
         return M[row * 4 + col];
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Matrix44 matrix44 = (Matrix44) o;
+        return Arrays.equals(M, matrix44.M);
+    }
+
+    @Override
+    public int hashCode() {
+        return Arrays.hashCode(M);
     }
 }
