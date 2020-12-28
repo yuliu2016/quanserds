@@ -109,16 +109,16 @@ public class Postman implements AutoCloseable {
         return this;
     }
 
-    public void sleep(long millis) {
+    public void sleep(double seconds) {
         try {
-            Thread.sleep(millis);
+            Thread.sleep((long) (seconds * 1000));
         } catch (InterruptedException ignored) {
         }
     }
 
     public void flush() {
         deliver();
-        sleep(10);
+        sleep(0.01);
         fetch();
         inbox_OTHER = new ArrayList<>();
         inbox_EMG = new ArrayList<>();

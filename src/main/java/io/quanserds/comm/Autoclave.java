@@ -20,7 +20,7 @@ public class  Autoclave {
     public void openDrawer(boolean drawer) {
         isOpen = drawer;
         comms.postMail(CommAPI.autoclave_OpenDrawer(
-                device_num, drawer ? 1 : 0)).deliver().sleep(10);
+                device_num, drawer ? 1 : 0)).deliver().sleep(0.01);
         waitForAck();
     }
 
@@ -34,7 +34,7 @@ public class  Autoclave {
             int count = 0;
             while (count == 0) {
                 count = comms.fetch();
-                comms.sleep(10);
+                comms.sleep(0.01);
             }
             containers = comms.checkMail(CommAPI.ID_AUTOCLAVE);
         }
