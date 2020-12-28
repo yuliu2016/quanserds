@@ -4,6 +4,7 @@ import io.quanserds.comm.struct.*;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 
 @SuppressWarnings("unused")
@@ -101,9 +102,14 @@ public class CommAPI {
     public static final int FCN_RESPONSE_WORLD_TRANSFORM = 4;
 
     private static ModularContainer container(
-            int device_id, int device_num, int deviceFunction, byte[] payload) {
+            int device_id, int device_num, int device_func, byte[] payload) {
         return ModularContainer.of(10 + payload.length,
-                device_id, device_num, deviceFunction, payload);
+                device_id, device_num, device_func, payload);
+    }
+
+    private static ModularContainer container(
+            int device_id, int device_num, int device_func) {
+        return container(device_id, device_num, device_func, new byte[0]);
     }
 
     private static byte[] packFloat(float... floats) {
@@ -129,12 +135,26 @@ public class CommAPI {
         return unpackFloat(container.getPayload());
     }
 
+    private static int unpackInt(byte[] payload) {
+        if (payload.length == 4) {
+            ByteBuffer bb = ByteBuffer.wrap(payload);
+            bb.order(ByteOrder.BIG_ENDIAN);
+            return bb.getInt();
+        } else {
+            return 0;
+        }
+    }
+
+    private static int unpackInt(ModularContainer container) {
+        return unpackInt(container.getPayload());
+    }
+
     public static ModularContainer common_RequestPing(int device_id, int device_num) {
-        return container(device_id, device_num, FCN_REQUEST_PING, new byte[0]);
+        return container(device_id, device_num, FCN_REQUEST_PING);
     }
 
     public static ModularContainer common_RequestWorldTransform(int device_id, int device_num) {
-        return container(device_id, device_num, FCN_REQUEST_WORLD_TRANSFORM, new byte[0]);
+        return container(device_id, device_num, FCN_REQUEST_WORLD_TRANSFORM);
     }
 
     public static WorldTransform common_ResponseWorldTransform(ModularContainer container) {
@@ -184,34 +204,34 @@ public class CommAPI {
     }
 
     public static ModularContainer qarm_RequestGripperObjectProperties(int device_num) {
-        return container(ID_QARM, device_num, FCN_QARM_REQUEST_GRIPPER_OBJECT_PROPERTIES, new byte[0]);
+        return container(ID_QARM, device_num, FCN_QARM_REQUEST_GRIPPER_OBJECT_PROPERTIES);
     }
 
-    public QArmState qarm_ResponseState(ModularContainer container) {
+    public static QArmState qarm_ResponseState(ModularContainer container) {
         return QArmState.fromPayload(container.getPayload());
     }
 
-    public float qarm_ResponseBase(ModularContainer container) {
+    public static float qarm_ResponseBase(ModularContainer container) {
         return unpackFloat(container);
     }
 
-    public float qarm_ResponseShoulder(ModularContainer container) {
+    public static float qarm_ResponseShoulder(ModularContainer container) {
         return unpackFloat(container);
     }
 
-    public float qarm_ResponseElbow(ModularContainer container) {
+    public static float qarm_ResponseElbow(ModularContainer container) {
         return unpackFloat(container);
     }
 
-    public float qarm_ResponseWrist(ModularContainer container) {
+    public static float qarm_ResponseWrist(ModularContainer container) {
         return unpackFloat(container);
     }
 
-    public QArmGripperState qarm_ResponseGripper(ModularContainer container) {
+    public static QArmGripperState qarm_ResponseGripper(ModularContainer container) {
         return QArmGripperState.fromPayload(container.getPayload());
     }
 
-    public QArmGripperObject qarm_ResponseGripperObjectProperties(ModularContainer container) {
+    public static QArmGripperObject qarm_ResponseGripperObjectProperties(ModularContainer container) {
         return QArmGripperObject.fromPayload(container.getPayload());
     }
 
@@ -220,40 +240,119 @@ public class CommAPI {
 
     private static final float QBOT_RADIUS = 0.235f / 2.0f;
 
-    public ModularContainer qbot2e_CommandAndRequestState(int device_num, float forward, float turn) {
+    public static ModularContainer qbot2e_CommandAndRequestState(int device_num, float forward, float turn) {
         float right_wheel_speed = forward + turn * QBOT_RADIUS;
         float left_wheel_speed = forward - turn * QBOT_RADIUS;
         return container(ID_QBOT, device_num, FCN_QBOT_COMMAND_AND_REQUEST_STATE,
                 packFloat(right_wheel_speed, left_wheel_speed));
     }
 
-    public ModularContainer qbot2e_CommandAndRequestStateTank(
+    public static ModularContainer qbot2e_CommandAndRequestStateTank(
             int device_num, float right_wheel_speed, float left_wheel_speed) {
         return container(ID_QBOT, device_num, FCN_QBOT_COMMAND_AND_REQUEST_STATE,
                 packFloat(right_wheel_speed, left_wheel_speed));
     }
 
-    public ModularContainer qbot2e_RequestRGB(int device_num) {
-        return container(ID_QBOT, device_num, FCN_QARM_REQUEST_RGB, new byte[0]);
+    public static ModularContainer qbot2e_RequestRGB(int device_num) {
+        return container(ID_QBOT, device_num, FCN_QARM_REQUEST_RGB);
     }
 
-    public ModularContainer qbot2e_RequestDepth(int device_num) {
-        return container(ID_QBOT, device_num, FCN_QBOT_REQUEST_DEPTH, new byte[0]);
+    public static ModularContainer qbot2e_RequestDepth(int device_num) {
+        return container(ID_QBOT, device_num, FCN_QBOT_REQUEST_DEPTH);
     }
 
-    public QBot2eState qbot2e_ResponseState(ModularContainer container) {
+    public static QBot2eState qbot2e_ResponseState(ModularContainer container) {
         return QBot2eState.fromPayload(container.getPayload());
     }
 
-    public byte[] qbot2e_ResponseRGB(ModularContainer container) {
+    public static byte[] qbot2e_ResponseRGB(ModularContainer container) {
         // just assume this is a valid payload for now.
         byte[] payload = container.getPayload();
         return Arrays.copyOfRange(payload, 4, payload.length);
     }
 
-    public byte[] qbot2e_ResponseDepth(ModularContainer container) {
+    public static byte[] qbot2e_ResponseDepth(ModularContainer container) {
         // just assume this is a valid payload for now.
         byte[] payload = container.getPayload();
         return Arrays.copyOfRange(payload, 4, payload.length);
+    }
+
+
+    // ================== EMG Interface ======================
+
+    public static ModularContainer EMG_RequestState(int device_num) {
+        return container(ID_EMG_INTERFACE, device_num, FCN_EMG_REQUEST_STATE);
+    }
+
+    public static float[] EMG_ResponseState(ModularContainer container) {
+        if (container.getPayload().length == 4) {
+            ByteBuffer bb = ByteBuffer.wrap(container.getPayload());
+            bb.order(ByteOrder.BIG_ENDIAN);
+            return new float[]{bb.getFloat(), bb.getFloat()};
+        } else {
+            return new float[]{0f, 0f};
+        }
+    }
+
+    // ================== SRV02 Bottle Table ======================
+
+    public static ModularContainer srv02BottleTable_CommandSpeed(int device_num, float speed) {
+        return container(ID_SRV02BOTTLETABLE, device_num, FCN_SRV02BT_COMMAND_SPEED, packFloat(speed));
+    }
+
+    public static ModularContainer srv02BottleTable_RequestEncoder(int device_num) {
+        return container(ID_SRV02BOTTLETABLE, device_num, FCN_SRV02BT_REQUEST_ENCODER);
+    }
+
+    public static ModularContainer srv02BottleTable_RequestTOF(int device_num) {
+        return container(ID_SRV02BOTTLETABLE, device_num, FCN_SRV02BT_REQUEST_TOF);
+    }
+
+    public static ModularContainer srv02BottleTable_RequestProximityShort(int device_num) {
+        return container(ID_SRV02BOTTLETABLE, device_num, FCN_SRV02BT_REQUEST_PROXIMITY_SHORT);
+    }
+
+    public static ModularContainer srv02BottleTable_RequestProximityTall(int device_num) {
+        return container(ID_SRV02BOTTLETABLE, device_num, FCN_SRV02BT_REQUEST_PROXIMITY_TALL);
+    }
+
+    public static ModularContainer srv02BottleTable_SpawnContainer(
+            int device_num, float height, float diameter, int metallic,
+            float r, float g, float b, float a, float roughness, float mass,
+            String properties) {
+        byte[] encoded_string = properties.getBytes(StandardCharsets.UTF_8);
+        ByteBuffer bb = ByteBuffer.allocate(37 + encoded_string.length);
+        bb.order(ByteOrder.BIG_ENDIAN);
+        bb.putFloat(height).putFloat(diameter).put((byte) metallic);
+        bb.putFloat(r).putFloat(g).putFloat(b).putFloat(a);
+        bb.putFloat(roughness).putFloat(mass);
+        bb.putInt(encoded_string.length).put(encoded_string);
+
+        return container(ID_SRV02BOTTLETABLE, device_num,
+                FCN_SRV02BT_SPAWN_CONTAINER, bb.array());
+    }
+
+    public static ModularContainer srv02BottleTable_RequestLoadMass(int device_num) {
+        return container(ID_SRV02BOTTLETABLE, device_num, FCN_SRV02BT_REQUEST_LOAD_MASS);
+    }
+
+    public static int srv02BottleTable_ResponseEncoder(ModularContainer container) {
+        return unpackInt(container);
+    }
+
+    public static float srv02BottleTable_ResponseTOF(ModularContainer container) {
+        return unpackFloat(container);
+    }
+
+    public static ProximityData srv02BottleTable_ResponseProximityShort(ModularContainer container) {
+        return ProximityData.fromPayload(container.getPayload());
+    }
+
+    public static ProximityData srv02BottleTable_ResponseProximityTall(ModularContainer container) {
+        return ProximityData.fromPayload(container.getPayload());
+    }
+
+    public static float srv02BottleTable_ResponesLoadMass(ModularContainer container) {
+        return unpackFloat(container);
     }
 }
