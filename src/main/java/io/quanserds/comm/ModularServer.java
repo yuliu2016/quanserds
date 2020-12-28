@@ -36,13 +36,6 @@ public class ModularServer implements AutoCloseable {
         System.out.println("Simulation connected");
     }
 
-    public static byte[] join(byte[] a, byte[] b, int bLength) {
-        byte[] joined = new byte[a.length + bLength];
-        System.arraycopy(a, 0, joined, 0, a.length);
-        System.arraycopy(b, 0, joined, a.length, bLength);
-        return joined;
-    }
-
     public void sendContainer(Container container) {
         ByteBuffer bb = ByteBuffer.allocate(15 + container.getPayload().length);
         bb.order(ByteOrder.LITTLE_ENDIAN);
@@ -68,7 +61,7 @@ public class ModularServer implements AutoCloseable {
         bb.put(container.getPayload());
 
         byte[] bytes = bb.array();
-        sendBuffer = join(sendBuffer, bytes, bytes.length);
+        sendBuffer = CommUtil.join(sendBuffer, bytes, bytes.length);
     }
 
     public void sendQueue() {
@@ -94,7 +87,7 @@ public class ModularServer implements AutoCloseable {
         boolean newData = false;
 
         while (bytesRead > 0) {
-            packetBuffer = join(packetBuffer, readBuffer, bytesRead);
+            packetBuffer = CommUtil.join(packetBuffer, readBuffer, bytesRead);
             // while we're here, check if there are any more bytes in the receive buffer
             bytesRead = serverStream.receive();
         }

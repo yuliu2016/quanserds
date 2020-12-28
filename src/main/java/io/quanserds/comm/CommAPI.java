@@ -7,6 +7,8 @@ import java.nio.ByteOrder;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 
+import static io.quanserds.comm.CommUtil.*;
+
 @SuppressWarnings("unused")
 public class CommAPI {
     public static final int ID_QARM = 10;
@@ -101,54 +103,6 @@ public class CommAPI {
     public static final int FCN_REQUEST_WORLD_TRANSFORM = 3;
     public static final int FCN_RESPONSE_WORLD_TRANSFORM = 4;
 
-    private static Container container(
-            int device_id, int device_num, int device_func, byte[] payload) {
-        return Container.of(10 + payload.length,
-                device_id, device_num, device_func, payload);
-    }
-
-    private static Container container(
-            int device_id, int device_num, int device_func) {
-        return container(device_id, device_num, device_func, new byte[0]);
-    }
-
-    private static byte[] packFloat(float... floats) {
-        ByteBuffer bb = ByteBuffer.allocate(floats.length * 4);
-        bb.order(ByteOrder.BIG_ENDIAN);
-        for (float aFloat : floats) {
-            bb.putFloat(aFloat);
-        }
-        return bb.array();
-    }
-
-    private static float unpackFloat(byte[] payload) {
-        if (payload.length == 4) {
-            ByteBuffer bb = ByteBuffer.wrap(payload);
-            bb.order(ByteOrder.BIG_ENDIAN);
-            return bb.getFloat();
-        } else {
-            return 0f;
-        }
-    }
-
-    private static float unpackFloat(Container container) {
-        return unpackFloat(container.getPayload());
-    }
-
-    private static int unpackInt(byte[] payload) {
-        if (payload.length == 4) {
-            ByteBuffer bb = ByteBuffer.wrap(payload);
-            bb.order(ByteOrder.BIG_ENDIAN);
-            return bb.getInt();
-        } else {
-            return 0;
-        }
-    }
-
-    private static int unpackInt(Container container) {
-        return unpackInt(container.getPayload());
-    }
-
     public static Container common_RequestPing(int device_id, int device_num) {
         return container(device_id, device_num, FCN_REQUEST_PING);
     }
@@ -235,7 +189,6 @@ public class CommAPI {
         return QArmGripperObject.fromPayload(container.getPayload());
     }
 
-
     // ================== QBOT2E ======================
 
     private static final float QBOT_RADIUS = 0.235f / 2.0f;
@@ -276,7 +229,6 @@ public class CommAPI {
         byte[] payload = container.getPayload();
         return Arrays.copyOfRange(payload, 4, payload.length);
     }
-
 
     // ================== EMG Interface ======================
 
@@ -364,5 +316,42 @@ public class CommAPI {
 
     public static float scale_ResponesLoadMass(Container container) {
         return unpackFloat(container);
+    }
+
+    // ================== QBot 2e Box ======================
+
+    public static Container qbot2eBox_Command(
+            int device_num, float x, float y, float z, float roll, float pitch, float yaw) {
+        return container(ID_QBOT_BOX, device_num, FCN_QBOT_BOX_COMMAND,
+                packFloat(x, y, z, roll, pitch, yaw));
+    }
+
+    // ================== Generic Spawner ======================
+
+    public static Container genericSpawner_Spawn(int device_num, int spawn_type) {
+        return container(ID_GENERIC_SPAWNER, device_num,
+                FCN_GENERIC_SPAWNER_SPAWN, new byte[]{(byte) spawn_type});
+    }
+
+    public static Container genericSpawner_Spawn_with_Properties(
+            int device_num, int spawn_type, float mass, String properties) {
+        byte[] encoded_string = properties.getBytes(StandardCharsets.UTF_8);
+        ByteBuffer bb = ByteBuffer.allocate(9 + encoded_string.length);
+        bb.order(ByteOrder.BIG_ENDIAN);
+        bb.put((byte) spawn_type).putFloat(mass);
+        bb.putInt(encoded_string.length).put(encoded_string);
+
+        return container(ID_GENERIC_SPAWNER, device_num,
+                FCN_GENERIC_SPAWNER_SPAWN_WITH_PROPERTIES, bb.array());
+    }
+
+    public int genericSpawner_SpawnAck(Container container) {
+        return container.getPayload().length == 1 ? container.getPayload()[0] : 0;
+    }
+
+    // ================== Autoclave ======================
+    public static Container autoclave_OpenDrawer(int device_num, int open_drawer) {
+        return container(ID_AUTOCLAVE, device_num,
+                FCN_AUTOCLAVE_OPEN_DRAWER, new byte[]{(byte) open_drawer});
     }
 }
