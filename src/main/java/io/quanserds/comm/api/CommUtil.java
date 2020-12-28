@@ -3,6 +3,7 @@ package io.quanserds.comm.api;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.charset.StandardCharsets;
+import java.util.function.BiConsumer;
 
 public class CommUtil {
     static Container container(
@@ -71,5 +72,33 @@ public class CommUtil {
             hexChars[j * 2 + 1] = HEX_ARRAY[v & 0x0F];
         }
         return new String(hexChars, StandardCharsets.UTF_8);
+    }
+
+    public static BiConsumer<Boolean, String> countingOutboundListener() {
+        return new BiConsumer<>() {
+            String previousData = "";
+            int previousCount = 0;
+
+            @Override
+            public void accept(Boolean success, String s) {
+                if (success) {
+                    if (s.equals(previousData)) {
+                        previousCount += 1;
+                    } else {
+                        if (previousCount != 0) {
+                            System.out.println(s + " [^" + previousCount + " Omitted]");
+                        } else {
+                            System.out.println(s);
+                        }
+                        previousCount = 0;
+                    }
+                    previousData = s;
+                } else {
+                    System.out.println("Failed Sending " + s);
+                    previousCount = 0;
+                    previousData = "";
+                }
+            }
+        };
     }
 }

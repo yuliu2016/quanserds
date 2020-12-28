@@ -48,6 +48,7 @@ public class ModularServer implements AutoCloseable {
         bb.put((byte) container.getDeviceFunction());
         bb.put(container.getPayload());
 
+        bb.flip(); // Prepare for writing the buffer
         serverStream.send(bb);
     }
 
@@ -74,6 +75,7 @@ public class ModularServer implements AutoCloseable {
         bb.put(MAGIC_BYTE);
         bb.put(sendBuffer);
 
+        bb.flip(); // Prepare for writing the buffer
         serverStream.send(bb);
         sendBuffer = new byte[0];
     }
