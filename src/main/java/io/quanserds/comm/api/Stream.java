@@ -5,6 +5,7 @@ import java.net.*;
 import java.nio.ByteBuffer;
 import java.nio.channels.*;
 import java.util.concurrent.*;
+import java.util.function.BiConsumer;
 
 /**
  * equivalent to quanser.communications.Stream
@@ -76,12 +77,26 @@ public class Stream implements AutoCloseable {
     }
 
     public void send(ByteBuffer buffer) {
-        // Doesn't actually check if it worked or not
-        clientChannel.write(buffer);
-    }
+        if (outboundDataListener == null) {
+            clientChannel.write(buffer);
+        } else {
+            String s = CommUtil.bytesToHex(buffer.array());
+            clientChannel.write(buffer, s, new CompletionHandler<>() {
+                @Override
+                public void completed(Integer result, String attachment) {
+                    if (outboundDataListener != null && attachment != null) {
+                        outboundDataListener.accept(true, attachment);
+                    }
+                }
 
-    public void send(byte[] data) {
-        send(ByteBuffer.wrap(data));
+                @Override
+                public void failed(Throwable exc, String attachment) {
+                    if (outboundDataListener != null && attachment != null) {
+                        outboundDataListener.accept(false, attachment);
+                    }
+                }
+            });
+        }
     }
 
     public int receive() {
@@ -103,5 +118,11 @@ public class Stream implements AutoCloseable {
     @Override
     public void close() throws Exception {
         stop();
+    }
+
+    private static BiConsumer<Boolean, String> outboundDataListener = null;
+
+    public static void setOutboundDataListener(BiConsumer<Boolean, String> outboundDataListener) {
+        Stream.outboundDataListener = outboundDataListener;
     }
 }
