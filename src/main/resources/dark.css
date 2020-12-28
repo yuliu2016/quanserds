@@ -225,6 +225,28 @@ HorizontalHeaderColumn > TableColumnHeader.column-header.table-column.selected >
     -fx-icon-color: white
 }
 
+.toggle-button {
+    -fx-background-color: #1e2e4a;
+    -fx-background-insets: 0;
+    -fx-text-fill: white;
+    -fx-font-size: 14;
+    -fx-padding: 2 8 4 8
+}
+
+.toggle-button:hover {
+    -fx-background-color: #3c5c94
+}
+
+.toggle-button:selected {
+    -fx-background-insets: 0, 0 -2 3 -2;
+    -fx-background-color: #fff300, #1e2e4a;
+}
+
+.toggle-button:selected:hover {
+    -fx-background-insets: 0, 0 -2 3 -2;
+    -fx-background-color: #fff300, #3c5c94;
+}
+
 .master-tab-icon-container {
     -fx-background-color: #333;
 }
