@@ -43,7 +43,7 @@ public class ModularServer implements AutoCloseable {
         return joined;
     }
 
-    public void sendContainer(ModularContainer container) {
+    public void sendContainer(Container container) {
         ByteBuffer bb = ByteBuffer.allocate(15 + container.getPayload().length);
         bb.order(ByteOrder.LITTLE_ENDIAN);
         bb.putInt(1 + container.getContainerSize());
@@ -58,7 +58,7 @@ public class ModularServer implements AutoCloseable {
         serverStream.send(bb);
     }
 
-    public void queueContainer(ModularContainer container) {
+    public void queueContainer(Container container) {
         ByteBuffer bb = ByteBuffer.allocate(10 + container.getPayload().length);
         bb.order(ByteOrder.BIG_ENDIAN);
         bb.putInt(container.getContainerSize());
@@ -122,11 +122,11 @@ public class ModularServer implements AutoCloseable {
         return newData;
     }
 
-    public List<ModularContainer> getReceivedContainers() {
+    public List<Container> getReceivedContainers() {
         if (packetIndex <= 0) {
             return Collections.emptyList();
         }
-        List<ModularContainer> containers = new ArrayList<>();
+        List<Container> containers = new ArrayList<>();
         ByteBuffer bb = ByteBuffer.wrap(packetBuffer);
         bb.position(packetIndex);
         bb.order(ByteOrder.BIG_ENDIAN);
@@ -139,7 +139,7 @@ public class ModularServer implements AutoCloseable {
             byte[] payload = new byte[containerSize - 10];
             bb.get(payload);
 
-            var container = ModularContainer.
+            var container = Container.
                     of(containerSize, deviceID, deviceNumber,deviceFunction,payload);
 
             containers.add(container);

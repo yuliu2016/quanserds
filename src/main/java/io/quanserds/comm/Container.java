@@ -1,17 +1,17 @@
 package io.quanserds.comm;
 
-public class ModularContainer {
+public class Container {
     private final int containerSize;
     private final int deviceID;
     private final int deviceNumber;
     private final int deviceFunction;
     private final byte[] payload;
 
-    private ModularContainer(int containerSize,
-                            int deviceID,
-                            int deviceNumber,
-                            int deviceFunction,
-                            byte[] payload) {
+    private Container(int containerSize,
+                      int deviceID,
+                      int deviceNumber,
+                      int deviceFunction,
+                      byte[] payload) {
         this.containerSize = containerSize;
         this.deviceID = deviceID;
         this.deviceNumber = deviceNumber;
@@ -39,16 +39,12 @@ public class ModularContainer {
         return payload;
     }
 
-    public static ModularContainer of(int containerSize,
-                             int deviceID,
-                             int deviceNumber,
-                             int deviceFunction,
-                             byte[] payload) {
-        return new ModularContainer(containerSize,
+    public static Container of(int containerSize,
+                               int deviceID,
+                               int deviceNumber,
+                               int deviceFunction,
+                               byte[] payload) {
+        return new Container(containerSize,
                 deviceID, deviceNumber, deviceFunction, payload);
-    }
-
-    public static ModularContainer empty() {
-        return of(0,0,0,0, new byte[0]);
     }
 }
