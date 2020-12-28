@@ -6,5 +6,5 @@ module quanserds {
     requires org.kordamp.ikonli.javafx;
     requires org.kordamp.ikonli.core;
 
-    exports ca.warp7.rt.view.aads;
+    exports io.quanserds;
 }

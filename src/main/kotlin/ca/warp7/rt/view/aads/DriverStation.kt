@@ -1,6 +1,6 @@
 package ca.warp7.rt.view.aads
 
-import ca.warp7.rt.view.fxkt.*
+import io.quanserds.fx.*;
 import javafx.application.Application
 import javafx.event.EventHandler
 import javafx.geometry.Insets
@@ -9,8 +9,6 @@ import javafx.scene.Scene
 import javafx.scene.control.Button
 import javafx.scene.control.ChoiceBox
 import javafx.scene.control.Label
-import javafx.scene.image.Image
-import javafx.scene.image.ImageView
 import javafx.scene.layout.VBox
 import javafx.scene.text.TextAlignment
 import javafx.scene.text.TextFlow

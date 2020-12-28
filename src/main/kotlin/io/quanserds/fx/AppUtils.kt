@@ -9,6 +9,7 @@ import javafx.scene.input.KeyCodeCombination
 import javafx.scene.input.KeyCombination
 import javafx.scene.input.KeyCombination.*
 
+@Suppress("unused")
 fun runOnFxThread(action: () -> Unit) {
     if (Platform.isFxApplicationThread()) {
         action()
@@ -17,13 +18,16 @@ fun runOnFxThread(action: () -> Unit) {
     }
 }
 
+@FXKtDSL
 fun label(text: String) = Label(text)
 
 
+@FXKtDSL
 fun <T> List<T>.observable(): ObservableList<T> {
     return FXCollections.observableList(this)
 }
 
+@FXKtDSL
 fun combo(
         keyCode: KeyCode,
         control: Boolean = false,

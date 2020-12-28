@@ -1,4 +1,4 @@
-package ca.warp7.rt.view.fxkt
+package io.quanserds.fx
 
 import javafx.collections.ObservableList
 

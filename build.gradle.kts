@@ -32,7 +32,7 @@ buildConfig {
 
 application {
     mainModule.set("quanserds")
-    mainClass.set("ca.warp7.rt.view.aads.Main")
+    mainClass.set("io.quanserds.Main")
 }
 
 tasks.test {

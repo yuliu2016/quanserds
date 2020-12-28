@@ -4,39 +4,78 @@ package io.quanserds.fx
 
 import javafx.event.ActionEvent
 import javafx.event.EventHandler
-import javafx.scene.control.Menu
-import javafx.scene.control.MenuBar
-import javafx.scene.control.MenuItem
-import javafx.scene.input.KeyCombination
-import org.kordamp.ikonli.Ikon
-import org.kordamp.ikonli.javafx.FontIcon
+import javafx.scene.control.*
+import javafx.scene.input.KeyCode
+import javafx.scene.input.KeyCodeCombination
+import javafx.scene.input.KeyCombination.*
 
-
+@FXKtDSL
 inline fun menuBar(builder: MenuBar.() -> Unit): MenuBar = MenuBar().apply(builder)
 
-
+@FXKtDSL
 fun MenuItem.name(name: String) {
     text = name
 }
 
-
+@FXKtDSL
 fun MenuItem.action(handler: (ActionEvent) -> Unit) {
     onAction = EventHandler(handler)
 }
 
-
+@FXKtDSL
 fun Menu.name(name: String) {
     text = name
 }
 
-fun menuItem(name: String, icon: Ikon?, combo: KeyCombination?, action: () -> Unit): MenuItem {
-    val mi = MenuItem(name)
-    if (combo != null) {
-        mi.accelerator = combo
-    }
-    if (icon != null) {
-        mi.graphic = FontIcon.of(icon, 15)
-    }
-    mi.setOnAction { action() }
-    return mi
+typealias Combination = KeyCodeCombination
+
+@FXKtDSL
+fun MenuItem.shortcut(
+        keyCode: KeyCode,
+        control: Boolean = false,
+        shift: Boolean = false,
+        alt: Boolean = false
+) {
+    accelerator = KeyCodeCombination(
+            keyCode,
+            if (control) SHORTCUT_DOWN else SHORTCUT_ANY,
+            if (alt) ALT_DOWN else ALT_ANY,
+            if (shift) SHIFT_DOWN else SHIFT_ANY
+    )
+}
+
+@FXKtDSL
+fun Modifier<MenuItem>.item(modifier: MenuItem.() -> Unit) {
+    +MenuItem().apply(modifier)
+}
+
+@FXKtDSL
+fun Modifier<MenuItem>.separator() {
+    +SeparatorMenuItem()
+}
+
+@FXKtDSL
+fun Modifier<MenuItem>.submenu(modifier: Menu.() -> Unit) {
+    +Menu().apply(modifier)
+}
+
+@FXKtDSL
+inline fun ContextMenu.modify(modifier: Modifier<MenuItem>.() -> Unit): ContextMenu {
+    Modifier(items).apply(modifier)
+    return this
+}
+
+@FXKtDSL
+inline fun Menu.modify(modifier: Modifier<MenuItem>.() -> Unit) {
+    Modifier(items).apply(modifier)
+}
+
+@FXKtDSL
+inline fun MenuBar.modify(modifier: Modifier<Menu>.() -> Unit) {
+    Modifier(menus).apply(modifier)
+}
+
+@FXKtDSL
+fun Modifier<Menu>.menu(modifier: Menu.() -> Unit) {
+    +Menu().apply(modifier)
 }
