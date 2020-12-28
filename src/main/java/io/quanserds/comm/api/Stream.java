@@ -1,4 +1,4 @@
-package io.quanserds.comm;
+package io.quanserds.comm.api;
 
 import java.io.IOException;
 import java.net.*;

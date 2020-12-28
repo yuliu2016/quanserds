@@ -1,4 +1,4 @@
-package io.quanserds.comm;
+package io.quanserds.comm.api;
 
 public class Container {
     private final int containerSize;

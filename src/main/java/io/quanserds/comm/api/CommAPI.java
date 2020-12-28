@@ -1,4 +1,4 @@
-package io.quanserds.comm;
+package io.quanserds.comm.api;
 
 import io.quanserds.comm.struct.*;
 
@@ -7,7 +7,7 @@ import java.nio.ByteOrder;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 
-import static io.quanserds.comm.CommUtil.*;
+import static io.quanserds.comm.api.CommUtil.*;
 
 @SuppressWarnings("unused")
 public class CommAPI {
