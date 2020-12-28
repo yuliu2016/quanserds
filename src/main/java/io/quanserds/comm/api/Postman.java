@@ -91,25 +91,34 @@ public class Postman implements AutoCloseable {
         return out;
     }
 
-    public void postMail(Container post) {
+    public List<Container> checkMail(int deviceID) {
+        return checkMail(deviceID, 0);
+    }
+
+    public Postman postMail(Container post) {
         commServer.queueContainer(post);
+        return this;
     }
 
     public void expressMail(Container post) {
         commServer.sendContainer(post);
     }
 
-    public void deliver() {
+    public Postman deliver() {
         commServer.sendQueue();
+        return this;
+    }
+
+    public void sleep(long millis) {
+        try {
+            Thread.sleep(millis);
+        } catch (InterruptedException ignored) {
+        }
     }
 
     public void flush() {
         deliver();
-        try {
-            Thread.sleep(10);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+        sleep(10);
         fetch();
         inbox_OTHER = new ArrayList<>();
         inbox_EMG = new ArrayList<>();
