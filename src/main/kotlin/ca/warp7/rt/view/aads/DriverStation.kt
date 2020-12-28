@@ -45,9 +45,9 @@ class DriverStation : Application() {
     private fun updateEnabled() {
         if (enabled) {
             enable.style = "-fx-font-size:22; -fx-font-weight: bold; -fx-text-fill: #00ff00; -fx-background-color:black"
-            disable.style = "-fx-font-size:22; -fx-font-weight: normal; -fx-text-fill: red; -fx-background-color:#1e2e4a"
+            disable.style = "-fx-font-size:22; -fx-font-weight: bold; -fx-text-fill: red; -fx-background-color:#1e2e4a"
         } else {
-            enable.style = "-fx-font-size:22; -fx-font-weight: normal; -fx-text-fill: #00ff00; -fx-background-color:#1e2e4a"
+            enable.style = "-fx-font-size:22; -fx-font-weight: bold; -fx-text-fill: #00ff00; -fx-background-color:#1e2e4a"
             disable.style = "-fx-font-size:22; -fx-font-weight: bold; -fx-text-fill: red; -fx-background-color:black"
         }
     }

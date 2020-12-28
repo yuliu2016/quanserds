@@ -61,7 +61,7 @@ public class QArmSimple {
             System.out.println("Invalid Angle. Shoulder does not rotate beyond +/- 90 degrees");
         } else {
             this.s = s;
-            arm.qarmMoveBase(this.s);
+            arm.qarmMoveShoulder(this.s);
         }
     }
 
@@ -71,7 +71,7 @@ public class QArmSimple {
             System.out.println("Invalid Angle. Elbow does not rotate beyond +90 or -80 degrees");
         } else {
             this.e = e;
-            arm.qarmMoveBase(this.e);
+            arm.qarmMoveElbow(this.e);
         }
     }
 
@@ -81,7 +81,7 @@ public class QArmSimple {
             System.out.println("Invalid Angle. Wrist does not rotate beyond +/- 170 degrees");
         } else {
             this.w = w;
-            arm.qarmMoveBase(this.w);
+            arm.qarmMoveWrist(this.w);
         }
     }
 
