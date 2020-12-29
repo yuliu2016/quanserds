@@ -4,6 +4,7 @@ import ca.warp7.rt.view.aads.kDarkCSS
 import ca.warp7.rt.view.aads.kMainCSS
 import io.quanserds.fx.*
 import io.quanserds.icon.fontIcon
+import io.quanserds.panel.QArmPanel
 import javafx.application.Application
 import javafx.geometry.Insets
 import javafx.geometry.Orientation
@@ -31,7 +32,7 @@ class QuanserDS : Application() {
             .toExternalForm(), 20.0)
 
         val bounds = Screen.getPrimary().visualBounds;
-        val h = bounds.height - bounds.width / ((3 + sqrt(5.0)) / 2)
+        val h = 348.0
         stage.title = "Quanser Driver Station"
         stage.x = 0.0
         stage.y = bounds.maxY - h
@@ -141,10 +142,7 @@ class QuanserDS : Application() {
                         })
                     })
                 })
-                add(vbox {
-                    width(300.0)
-                    style = "-fx-background-color: #1e2e4a"
-                })
+                add(QArmPanel().getNode())
                 add(vbox {
                     width(300.0)
                     style = "-fx-background-color: #1e2e4a"
@@ -155,7 +153,7 @@ class QuanserDS : Application() {
                 })
             })
         }).apply {
-            stylesheets.addAll(kMainCSS, kDarkCSS)
+            stylesheets.addAll("/quanserds.css")
         }
         stage.width = bounds.width
         stage.height = h
