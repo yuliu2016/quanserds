@@ -7,6 +7,8 @@ import javafx.geometry.Pos
 import javafx.scene.Node
 import javafx.scene.control.Button
 import javafx.scene.control.Label
+import javafx.scene.image.Image
+import javafx.scene.image.ImageView
 import javafx.scene.text.TextAlignment
 import org.kordamp.ikonli.materialdesign2.MaterialDesignA
 import org.kordamp.ikonli.materialdesign2.MaterialDesignR
@@ -16,12 +18,18 @@ class CommsPanel : ControlPanel {
     val panel = vbox {
         maxWidth = 240.0
         spacing = 8.0
+
+        val img = Image(CommsPanel::class.java.getResourceAsStream("/fireball_dark.png"))
         add(vbox {
             style = "-fx-background-color: #1e2e4a"
             vgrow()
             align(Pos.TOP_CENTER)
             spacing = 8.0
             padding = Insets(8.0)
+            add(ImageView(img).apply {
+                isPreserveRatio = true
+                this.fitWidth = 80.0
+            })
             add(hbox {
                 spacing = 8.0
                 align(Pos.CENTER_LEFT)

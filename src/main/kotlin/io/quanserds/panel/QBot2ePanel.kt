@@ -2,12 +2,14 @@ package io.quanserds.panel
 
 import io.quanserds.fx.*
 import io.quanserds.icon.fontIcon
+import javafx.geometry.HPos
 import javafx.geometry.Insets
 import javafx.geometry.Pos
 import javafx.scene.Node
 import javafx.scene.control.Button
 import javafx.scene.control.Label
 import javafx.scene.control.Tooltip
+import javafx.scene.layout.GridPane
 import org.kordamp.ikonli.materialdesign2.*
 
 class QBot2ePanel : ControlPanel {
@@ -50,8 +52,8 @@ class QBot2ePanel : ControlPanel {
         add(gridPane {
             hgap = 8.0
             vgap = 4.0
-            add(label("Left"), 1, 0)
-            add(label("Right"), 2, 0)
+            add(label("Left").gridCenter(), 1, 0)
+            add(label("Right").gridCenter(), 2, 0)
             add(label("Velocity"), 0, 1)
             add(tf(), 1, 1)
             add(tf(), 2, 1)
@@ -63,9 +65,9 @@ class QBot2ePanel : ControlPanel {
         add(gridPane {
             hgap = 8.0
             vgap = 4.0
-            add(label("x"), 1, 0)
-            add(label("y"), 2, 0)
-            add(label("z"), 3, 0)
+            add(label("x").gridCenter(), 1, 0)
+            add(label("y").gridCenter(), 2, 0)
+            add(label("z").gridCenter(), 3, 0)
             add(label("World"), 0, 1)
             add(tf(), 1, 1)
             add(tf(), 2, 1)
@@ -81,7 +83,10 @@ class QBot2ePanel : ControlPanel {
         })
 
         vspace()
+    }
 
+    private fun Node.gridCenter() = apply {
+        GridPane.setHalignment(this, HPos.CENTER)
     }
 
     private fun tf() = textField {
@@ -126,6 +131,10 @@ class QBot2ePanel : ControlPanel {
             align(Pos.CENTER_RIGHT)
             padding = Insets(0.0, 4.0, 0.0, 4.0)
             spacing = 8.0
+            add(Button("Dump", fontIcon(MaterialDesignS.SLOPE_DOWNHILL, 20)).apply {
+                tooltip = Tooltip("Dump the Box")
+            })
+            hspace()
             add(Button("", fontIcon(MaterialDesignS.STOP, 20)).apply {
                 tooltip = Tooltip("Move to Home")
             })
