@@ -66,17 +66,17 @@
 }
 
 .slider .track {
-    -fx-background-color: transparent, transparent, #888;
+    -fx-background-color: transparent, transparent, #fff;
 }
 
 .slider .thumb {
     -fx-focus-color: transparent;
     -fx-faint-focus-color: transparent;
-    -fx-background-color: #3c5c94;
+    -fx-background-color: #5a8ade;
 }
 
 .slider .thumb:pressed {
-    -fx-background-color: #5a8ade;
+    -fx-background-color: #fff000;
 }
 
 /* ==================== BUTTON ==================== */
@@ -123,12 +123,14 @@
 
 .text-field {
     -fx-padding: 2 3 2 3;
-    -fx-background-color: #f8f8f8;
-    -fx-border-color: #888;
+    -fx-background-color: #00223f;
+    -fx-border-color: #5a8ade;
     -fx-border-radius: 0;
-    -fx-border-width: 1.5;
+    -fx-border-width: 2;
     -fx-prompt-text-fill: #666;
-    -fx-text-fill: black;
+    -fx-text-fill: white;
+    -fx-font-family: "Segoe UI", "Open Sans", "Arial", sans-serif;
+    -fx-font-weight: bold;
     -fx-border-insets: 0;
     -fx-background-insets: 0;
     -fx-focus-color: transparent;
@@ -137,6 +139,6 @@
 }
 
 .text-field:focused {
-    -fx-border-color: #5a8ade;
+    -fx-border-color: #fff000;
     -fx-border-insets: 0;
 }
