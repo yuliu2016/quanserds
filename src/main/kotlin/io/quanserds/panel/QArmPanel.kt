@@ -1,12 +1,17 @@
 package io.quanserds.panel
 
 import io.quanserds.fx.*
+import io.quanserds.icon.fontIcon
 import javafx.geometry.HPos
 import javafx.geometry.Insets
 import javafx.geometry.Pos
 import javafx.scene.Node
+import javafx.scene.control.Button
 import javafx.scene.control.Label
+import javafx.scene.control.Tooltip
 import javafx.scene.layout.GridPane
+import org.kordamp.ikonli.materialdesign2.MaterialDesignC
+import org.kordamp.ikonli.materialdesign2.MaterialDesignH
 
 class QArmPanel : ControlPanel {
 
@@ -33,19 +38,58 @@ class QArmPanel : ControlPanel {
             add(textField {
                 width(80.0)
                 text = "0.4064"
-                isDisable = true
+                isEditable = false
             }, 0, 1)
             add(textField {
                 width(80.0)
                 text = "0.0000"
-                isDisable = true
+                isEditable = false
             }, 1, 1)
             add(textField {
                 width(80.0)
                 text = "0.4826"
-                isDisable = true
+                isEditable = false
             }, 2, 1)
         })
+
+
+        vspace()
+
+        add(gridPane {
+            hgap = 10.0
+            vgap = 4.0
+            add(fingerPad(), 0, 0)
+            add(fingerPad(), 1, 0)
+            add(fingerPad(), 2, 0)
+            add(fingerPad(), 3, 0)
+        })
+
+
+        add(hbox {
+            align(Pos.CENTER_RIGHT)
+            padding = Insets(0.0, 4.0, 0.0, 4.0)
+            spacing = 8.0
+            add(Button("", fontIcon(MaterialDesignH.HOME, 20)).apply {
+                tooltip = Tooltip("Move to Home")
+            })
+            add(Button("", fontIcon(MaterialDesignC.CURSOR_TEXT, 20)).apply {
+                tooltip = Tooltip("Move to Position")
+            })
+            add(Button("", fontIcon(MaterialDesignC.CONTENT_COPY, 20)).apply {
+                tooltip = Tooltip("Copy QArm Info")
+            })
+            add(Button("", fontIcon(MaterialDesignH.HISTORY, 20)).apply {
+                tooltip = Tooltip("Recent Positions")
+            })
+        })
+    }
+
+    private fun fingerPad() : Node {
+        return hbox {
+            height(8.0)
+            width(56.0)
+            style = "-fx-background-color: orange"
+        }
     }
 
     private fun gridLabel(text: String): Label {

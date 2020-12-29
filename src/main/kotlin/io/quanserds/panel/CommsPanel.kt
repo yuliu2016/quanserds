@@ -14,7 +14,7 @@ import org.kordamp.ikonli.materialdesign2.MaterialDesignS
 
 class CommsPanel : ControlPanel {
     val panel = vbox {
-        maxWidth = 260.0
+        maxWidth = 240.0
         spacing = 8.0
         add(vbox {
             style = "-fx-background-color: #1e2e4a"
@@ -23,47 +23,52 @@ class CommsPanel : ControlPanel {
             spacing = 8.0
             padding = Insets(8.0)
             add(hbox {
-                align(Pos.CENTER)
                 spacing = 8.0
-                add(Label("Communication").apply {
+                align(Pos.CENTER_LEFT)
+                add(Label("Comms").apply {
                     style = "-fx-font-weight: bold"
-                    prefWidth = 165.0
+                    prefWidth = 65.0
                 })
-                add(vbox {
-                    prefWidth = 25.0
-                    maxHeight = 10.0
-                    style = "-fx-background-color:red"
-                })
+                repeat(5) {
+                    add(commBox())
+                }
             })
             add(hbox {
-                align(Pos.CENTER)
                 spacing = 8.0
+                align(Pos.CENTER_LEFT)
                 add(Label("Server").apply {
                     style = "-fx-font-weight: bold"
-                    prefWidth = 85.0
+                    prefWidth = 65.0
                 })
-                add(Label("localhost:18001").apply {
-                    style = "-font-family: 'Arial';-fx-text-fill: #0f0; -fx-font-weight: bold"
-                    prefWidth = 105.0
+                add(textField {
+                    text = "localhost:18001"
+                    isEditable = false
+                    width(150.0)
                 })
             })
 
             add(hbox {
-                align(Pos.CENTER)
                 spacing = 8.0
-                add(Label("Simulator").apply {
+                align(Pos.CENTER_LEFT)
+                add(Label("Client").apply {
                     style = "-fx-font-weight: bold"
-                    prefWidth = 75.0
+                    prefWidth = 65.0
                 })
-                add(Label("192.168.0.1:63345").apply {
-                    style = "-font-family: 'Arial';-fx-text-fill: #f80; -fx-font-weight: bold"
-                    prefWidth = 115.0
+                add(textField {
+                    text = "192.168.0.1:63345"
+                    isEditable = false
+                    width(150.0)
                 })
             })
 
             vspace()
-            add(Button("", fontIcon(MaterialDesignS.STOP, 16)))
-            add(Button("", fontIcon(MaterialDesignR.RELOAD, 16)))
+            add(hbox {
+                spacing = 8.0
+                padding = Insets(0.0, 4.0, 0.0, 4.0)
+                align(Pos.CENTER_RIGHT)
+                add(Button("", fontIcon(MaterialDesignS.STOP, 20)))
+                add(Button("", fontIcon(MaterialDesignR.RELOAD, 20)))
+            })
         })
         add(vbox {
             style = "-fx-background-color: #1e2e4a"
@@ -76,6 +81,12 @@ class CommsPanel : ControlPanel {
                 style = "-fx-font-size: 20; -fx-font-weight:bold"
             })
         })
+    }
+
+    private fun commBox() = vbox {
+        prefWidth = 25.0
+        maxHeight = 10.0
+        style = "-fx-background-color:red"
     }
 
     override fun getNode() = panel

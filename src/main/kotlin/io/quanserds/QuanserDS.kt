@@ -44,6 +44,7 @@ class QuanserDS : Application() {
             style = "-fx-background-color: rgb(0, 68, 126)"
             add(hbox {
                 spacing = 8.0
+                padding = Insets(0.0, 4.0, 0.0, 4.0)
                 height(24.0)
                 align(Pos.CENTER_LEFT)
                 add(ImageView(ic).apply {
@@ -76,13 +77,10 @@ class QuanserDS : Application() {
 
                 hspace()
 
-                add(fontIcon(MaterialDesignI.INFORMATION_OUTLINE, 20))
-                add(fontIcon(MaterialDesignC.COG_OUTLINE, 20))
-                add(fontIcon(MaterialDesignR.RELOAD, 20))
-                add(fontIcon(MaterialDesignW.WINDOW_MINIMIZE, 20).also {
+                add(Button("", fontIcon(MaterialDesignW.WINDOW_MINIMIZE, 20)).also {
                     it.setOnMouseClicked { stage.isIconified = true }
                 })
-                add(fontIcon(MaterialDesignW.WINDOW_CLOSE, 20).also {
+                add(Button("", fontIcon(MaterialDesignW.WINDOW_CLOSE, 20)).also {
                     it.setOnMouseClicked { stage.close() }
                 })
             })
