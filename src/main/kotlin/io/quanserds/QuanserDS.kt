@@ -7,6 +7,7 @@ import io.quanserds.panel.QArmPanel
 import io.quanserds.panel.QBot2ePanel
 import javafx.application.Application
 import javafx.geometry.Insets
+import javafx.geometry.Orientation
 import javafx.geometry.Pos
 import javafx.scene.Scene
 import javafx.scene.control.*
@@ -54,6 +55,10 @@ class QuanserDS : Application() {
                     style = "-fx-font-size: 14"
                 })
 
+                add(label("v${BuildConfig.kVersion}").apply {
+                    style = "-fx-text-fill: #0f0; -fx-font-size: 14"
+                })
+
                 add(toggleTab("Connection", MaterialDesignA.ACCESS_POINT, true))
                 add(toggleTab("QArm", MaterialDesignR.ROBOT_INDUSTRIAL, true))
                 add(toggleTab("QBot2e", MaterialDesignR.ROBOT_VACUUM, true))
@@ -63,6 +68,7 @@ class QuanserDS : Application() {
                 add(toggleTab("Autonomous", MaterialDesignC.CONSOLE_LINE, false))
 
                 hspace()
+
 
                 add(Button("", fontIcon(MaterialDesignW.WINDOW_MINIMIZE, 20)).also {
                     it.setOnMouseClicked { stage.isIconified = true }
