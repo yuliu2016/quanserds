@@ -1,7 +1,5 @@
 package io.quanserds
 
-import ca.warp7.rt.view.aads.kDarkCSS
-import ca.warp7.rt.view.aads.kMainCSS
 import io.quanserds.fx.*
 import io.quanserds.icon.fontIcon
 import io.quanserds.panel.CommsPanel

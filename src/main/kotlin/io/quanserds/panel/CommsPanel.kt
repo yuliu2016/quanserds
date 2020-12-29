@@ -10,6 +10,7 @@ import javafx.scene.control.Label
 import javafx.scene.text.TextAlignment
 import org.kordamp.ikonli.materialdesign2.MaterialDesignA
 import org.kordamp.ikonli.materialdesign2.MaterialDesignR
+import org.kordamp.ikonli.materialdesign2.MaterialDesignS
 
 class CommsPanel : ControlPanel {
     val panel = vbox {
@@ -61,7 +62,8 @@ class CommsPanel : ControlPanel {
             })
 
             vspace()
-            add(Button("Reconnect", fontIcon(MaterialDesignR.RELOAD, 16)))
+            add(Button("", fontIcon(MaterialDesignS.STOP, 16)))
+            add(Button("", fontIcon(MaterialDesignR.RELOAD, 16)))
         })
         add(vbox {
             style = "-fx-background-color: #1e2e4a"

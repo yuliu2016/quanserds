@@ -75,7 +75,7 @@
     -fx-background-color: #5a8ade;
 }
 
-.slider .thumb:pressed {
+.slider:focused .thumb {
     -fx-background-color: #fff000;
 }
 
