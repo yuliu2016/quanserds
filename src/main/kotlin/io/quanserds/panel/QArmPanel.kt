@@ -22,7 +22,7 @@ class QArmPanel : ControlPanel {
         padding = Insets(8.0)
         add(gridPane {
             hgap = 8.0
-            vgap = 8.0
+            vgap = 4.0
             makeSlider(0, "Base")
             makeSlider(1, "Shoulder")
             makeSlider(2, "Elbow")
@@ -58,10 +58,16 @@ class QArmPanel : ControlPanel {
         add(gridPane {
             hgap = 10.0
             vgap = 4.0
-            add(fingerPad(), 0, 0)
-            add(fingerPad(), 1, 0)
-            add(fingerPad(), 2, 0)
-            add(fingerPad(), 3, 0)
+            add(fingerPad(0), 0, 0)
+            add(fingerPad(0), 1, 0)
+            add(fingerPad(0), 2, 0)
+            add(fingerPad(0), 3, 0)
+        })
+
+        add(textField {
+            isEditable = false
+            text = "No Gripped Object"
+            width(256.0)
         })
 
 
@@ -75,6 +81,9 @@ class QArmPanel : ControlPanel {
             add(Button("", fontIcon(MaterialDesignC.CURSOR_TEXT, 20)).apply {
                 tooltip = Tooltip("Move to Position")
             })
+            add(Button("", fontIcon(MaterialDesignC.CALCULATOR, 20)).apply {
+                tooltip = Tooltip("QArm Math Calculator")
+            })
             add(Button("", fontIcon(MaterialDesignC.CONTENT_COPY, 20)).apply {
                 tooltip = Tooltip("Copy QArm Info")
             })
@@ -84,11 +93,11 @@ class QArmPanel : ControlPanel {
         })
     }
 
-    private fun fingerPad() : Node {
+    private fun fingerPad(rotate: Int): Node {
         return hbox {
-            height(8.0)
+            height(4.0)
             width(56.0)
-            style = "-fx-background-color: orange"
+            style = "-fx-background-color: orange; -fx-rotate: $rotate;"
         }
     }
 
@@ -100,13 +109,20 @@ class QArmPanel : ControlPanel {
     }
 
     private fun GridPane.makeSlider(index: Int, text: String) {
-        add(label(text), 0, index)
+        val tooltip = Tooltip("Control the $text of the QArm between (-20°, 20°)")
+        add(label {
+            this.text = text
+            this.tooltip = tooltip
+        }, 0, index)
         add(slider {
+            this.value = 50.0
             width(120.0)
+            this.tooltip = tooltip
         }, 1, index)
         add(textField {
             this.text = "0"
             width(60.0)
+            this.tooltip = tooltip
         }, 2, index)
     }
 

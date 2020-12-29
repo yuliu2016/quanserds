@@ -90,7 +90,11 @@
 }
 
 .button:hover {
-    -fx-background-color: #3c5c94;
+    -fx-background-color: #5a8ade;
+}
+
+.button:pressed {
+    -fx-background-color: #4b73b8;
 }
 
 .button .ikonli-font-icon {
@@ -108,7 +112,7 @@
 }
 
 .toggle-button:hover {
-    -fx-background-color: #3c5c94
+    -fx-background-color: #5a8ade
 }
 
 .toggle-button:selected {
@@ -118,7 +122,7 @@
 
 .toggle-button:selected:hover {
     -fx-background-insets: 0, 0 -2 3 -2;
-    -fx-background-color: #fff300, #3c5c94;
+    -fx-background-color: #fff300, #5a8ade;
 }
 
 /* ==================== TEXT FIELD ==================== */

@@ -4,31 +4,28 @@ import io.quanserds.fx.*
 import io.quanserds.icon.fontIcon
 import io.quanserds.panel.CommsPanel
 import io.quanserds.panel.QArmPanel
+import io.quanserds.panel.QBot2ePanel
 import javafx.application.Application
 import javafx.geometry.Insets
-import javafx.geometry.Orientation
 import javafx.geometry.Pos
 import javafx.scene.Scene
 import javafx.scene.control.*
 import javafx.scene.image.Image
 import javafx.scene.image.ImageView
-import javafx.scene.layout.Background
-import javafx.scene.layout.BackgroundFill
-import javafx.scene.paint.Color
 import javafx.scene.text.Font
-import javafx.scene.text.TextAlignment
 import javafx.stage.Screen
 import javafx.stage.Stage
 import javafx.stage.StageStyle
-import org.kordamp.ikonli.javafx.FontIcon
+import org.kordamp.ikonli.Ikon
 import org.kordamp.ikonli.materialdesign2.*
-import kotlin.math.sqrt
 
 class QuanserDS : Application() {
     override fun start(stage: Stage) {
 
-        Font.loadFont(QuanserDS::class.java.getResource("/Audiowide-Regular.ttf")
-            .toExternalForm(), 20.0)
+        Font.loadFont(
+            QuanserDS::class.java.getResource("/Audiowide-Regular.ttf")
+                .toExternalForm(), 20.0
+        )
 
         val bounds = Screen.getPrimary().visualBounds;
         val h = 348.0
@@ -57,23 +54,13 @@ class QuanserDS : Application() {
                     style = "-fx-font-size: 14"
                 })
 
-                add(ToggleButton("Connection", fontIcon(MaterialDesignA.ACCESS_POINT, 16)).apply {
-                    isSelected = true
-                })
-                add(ToggleButton("QArm", fontIcon(MaterialDesignR.ROBOT_INDUSTRIAL, 16)).apply {
-                    isSelected = true
-                })
-                add(ToggleButton("QBot2e", fontIcon(MaterialDesignR.ROBOT_VACUUM, 16)).apply {
-                    isSelected = true
-                })
-                add(ToggleButton("Table", fontIcon(MaterialDesignF.FERRIS_WHEEL, 16)).apply {
-                    isSelected = true
-                })
-                add(ToggleButton("Autoclave", fontIcon(MaterialDesignF.FILE_CABINET, 16)))
-                add(ToggleButton("EMG", fontIcon(MaterialDesignA.ARM_FLEX, 16)))
-
-                add(ToggleButton("Spawner", fontIcon(MaterialDesignP.PACKAGE_VARIANT, 16)))
-                add(ToggleButton("Scale", fontIcon(MaterialDesignS.SCALE, 16)))
+                add(toggleTab("Connection", MaterialDesignA.ACCESS_POINT, true))
+                add(toggleTab("QArm", MaterialDesignR.ROBOT_INDUSTRIAL, true))
+                add(toggleTab("QBot2e", MaterialDesignR.ROBOT_VACUUM, true))
+                add(toggleTab("Table", MaterialDesignF.FERRIS_WHEEL, true))
+                add(toggleTab("Autoclave", MaterialDesignF.FILE_CABINET, false))
+                add(toggleTab("Scale", MaterialDesignS.SCALE, false))
+                add(toggleTab("Autonomous", MaterialDesignC.CONSOLE_LINE, false))
 
                 hspace()
 
@@ -89,10 +76,7 @@ class QuanserDS : Application() {
                 spacing = 8.0
                 add(CommsPanel().getNode())
                 add(QArmPanel().getNode())
-                add(vbox {
-                    width(300.0)
-                    style = "-fx-background-color: #1e2e4a"
-                })
+                add(QBot2ePanel().getNode())
                 add(vbox {
                     width(300.0)
                     style = "-fx-background-color: #1e2e4a"
@@ -105,4 +89,11 @@ class QuanserDS : Application() {
         stage.height = h
         stage.show()
     }
+
+    private fun toggleTab(text: String, icon: Ikon, selected: Boolean) =
+        ToggleButton(text, fontIcon(icon, 16)).apply {
+            tooltip = Tooltip("Toggle the $text Tab")
+            styleClass("toggle-button-tab")
+            isSelected = selected
+        }
 }
