@@ -27,6 +27,7 @@ class CommsPanel : ControlPanel {
             spacing = 8.0
             padding = Insets(8.0)
             add(ImageView(img).apply {
+                this.isSmooth = true
                 isPreserveRatio = true
                 this.fitWidth = 80.0
             })

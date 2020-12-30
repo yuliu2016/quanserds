@@ -148,3 +148,24 @@
     -fx-border-color: #fff000;
     -fx-border-insets: 0;
 }
+
+/* ==================== Radio Button ==================== */
+.radio-button {
+    -fx-text-fill: white;
+}
+
+.radio-button .radio {
+    -fx-background-image: null;
+    -fx-background-insets: 0, 2;
+    -fx-background-color: #5a8ade, #00223f;
+}
+
+.radio-button:selected .radio {
+    -fx-background-color: #fff000, #00223f;
+}
+
+.radio-button:selected .dot {
+    -fx-translate: 0;
+    -fx-background-color: #fff000;
+    -fx-background-insets: 1;
+}

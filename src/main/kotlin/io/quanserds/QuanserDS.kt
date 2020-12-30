@@ -2,9 +2,7 @@ package io.quanserds
 
 import io.quanserds.fx.*
 import io.quanserds.icon.fontIcon
-import io.quanserds.panel.CommsPanel
-import io.quanserds.panel.QArmPanel
-import io.quanserds.panel.QBot2ePanel
+import io.quanserds.panel.*
 import javafx.application.Application
 import javafx.geometry.Insets
 import javafx.geometry.Orientation
@@ -83,10 +81,8 @@ class QuanserDS : Application() {
                 add(CommsPanel().getNode())
                 add(QArmPanel().getNode())
                 add(QBot2ePanel().getNode())
-                add(vbox {
-                    width(300.0)
-                    style = "-fx-background-color: #1e2e4a"
-                })
+                add(TablePanel().getNode())
+                add(AutoclavePanel().getNode())
             })
         }).apply {
             stylesheets.addAll("/quanserds.css")

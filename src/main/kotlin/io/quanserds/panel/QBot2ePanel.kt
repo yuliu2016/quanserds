@@ -131,7 +131,7 @@ class QBot2ePanel : ControlPanel {
             align(Pos.CENTER_RIGHT)
             padding = Insets(0.0, 4.0, 0.0, 4.0)
             spacing = 8.0
-            add(Button("Dump", fontIcon(MaterialDesignS.SLOPE_DOWNHILL, 20)).apply {
+            add(Button("", fontIcon(MaterialDesignS.SLOPE_DOWNHILL, 20)).apply {
                 tooltip = Tooltip("Dump the Box")
             })
             hspace()
