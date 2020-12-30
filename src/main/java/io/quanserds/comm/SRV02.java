@@ -86,4 +86,54 @@ public class SRV02 {
     public void rotateCounterclockwise(double speed) {
         rotate(-speed);
     }
+
+    // Encoder counts to degrees
+    private static final double kEnc = 360.0 / 4096;
+    private static final double kP = 0.02;
+    private static final double kSaturationVoltage = 2.0;
+
+    /**
+     * Rotate table for given angle in degrees (closed-loop; proportional-only for now)
+     * Both positive and negative angle can be commanded. However, do no rotate table
+     * CCW past initial zero position. Encoder wraps.
+     */
+    public void commandPID(double angle) {
+        int initial_encoder_count = readEncoder();
+
+        double error = Math.abs(angle);
+        double direction = Math.signum(angle);
+
+        while (error > 0.05) {
+            double speed = kP * error;
+            if (speed > kSaturationVoltage) {
+                speed = kSaturationVoltage;
+            }
+            rotate(direction * speed);
+
+            int current_encoder_count = readEncoder();
+            double current_angle;
+            current_angle = (current_encoder_count - initial_encoder_count) * kEnc;
+            if (angle > 0) {
+                error = angle - current_angle;
+            } else {
+                error = current_angle - angle;
+            }
+        }
+
+        stopTable();
+    }
+
+    public void stopTable() {
+        rotate(0);
+    }
+
+    public void spawnSingleBottle(double r, double g, double b, double alpha, boolean metal) {
+        comms.postMail(srv02BottleTable_SpawnContainer(device_num, 0.1f, 0.65f, metal ? 1 : 0,
+                (float) r, (float) g, (float) b, (float) alpha, 1, 1,
+                metal ? "metal" : "plastic")).deliver().sleep(0.1);
+    }
+
+    public void ping() {
+        comms.postMail(common_RequestPing(ID_SRV02BOTTLETABLE, 0)).deliver();
+    }
 }
