@@ -5,7 +5,6 @@ import io.quanserds.icon.fontIcon
 import io.quanserds.panel.*
 import javafx.application.Application
 import javafx.geometry.Insets
-import javafx.geometry.Orientation
 import javafx.geometry.Pos
 import javafx.scene.Scene
 import javafx.scene.control.*
@@ -67,11 +66,18 @@ class QuanserDS : Application() {
 
                 hspace()
 
+                add(Button("", fontIcon(MaterialDesignS.SPIDER_WEB, 20)).also {
+                    it.tooltip = Tooltip("Show Threads")
+                    it.setOnMouseClicked { showThreads() }
+                    it.isVisible = false
+                })
 
                 add(Button("", fontIcon(MaterialDesignW.WINDOW_MINIMIZE, 20)).also {
+                    it.tooltip = Tooltip("Minimize Window")
                     it.setOnMouseClicked { stage.isIconified = true }
                 })
                 add(Button("", fontIcon(MaterialDesignW.WINDOW_CLOSE, 20)).also {
+                    it.tooltip = Tooltip("Close Window")
                     it.setOnMouseClicked { stage.close() }
                 })
             })
@@ -90,6 +96,15 @@ class QuanserDS : Application() {
         stage.width = bounds.width
         stage.height = h
         stage.show()
+    }
+
+    private fun showThreads() {
+        val traces = Thread.getAllStackTraces()
+        val t = traces.keys.sortedBy { it.name }.joinToString("\n") {
+            val name = it.name + " ".repeat(26 - it.name.length)
+            "$name Priority:${it.priority}  Daemon:${it.isDaemon}  Group:${it.threadGroup.name}"
+        }
+        Splash.alert(null, "Threads", t, true)
     }
 
     private fun toggleTab(text: String, icon: Ikon, selected: Boolean) =

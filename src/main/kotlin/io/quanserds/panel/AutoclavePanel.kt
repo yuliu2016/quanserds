@@ -25,9 +25,9 @@ class AutoclavePanel : ControlPanel {
         add(gridPane {
             vgap = 4.0
             hgap = 8.0
-            add(label("Red"), 0, 0)
-            add(label("Green"), 0, 1)
-            add(label("Blue"), 0, 2)
+            add(label("R"), 0, 0)
+            add(label("G"), 0, 1)
+            add(label("B"), 0, 2)
             openClose(0)
             openClose(1)
             openClose(2)

@@ -13,6 +13,7 @@ import javafx.scene.layout.GridPane
 import org.kordamp.ikonli.materialdesign2.MaterialDesignC
 import org.kordamp.ikonli.materialdesign2.MaterialDesignH
 import org.kordamp.ikonli.materialdesign2.MaterialDesignI
+import org.kordamp.ikonli.materialdesign2.MaterialDesignP
 
 class QArmPanel : ControlPanel {
 
@@ -78,6 +79,9 @@ class QArmPanel : ControlPanel {
             spacing = 8.0
             add(Button("", fontIcon(MaterialDesignH.HOME, 20)).apply {
                 tooltip = Tooltip("Move to Home")
+            })
+            add(Button("", fontIcon(MaterialDesignP.PALETTE_OUTLINE, 20)).apply {
+                tooltip = Tooltip("Change Base Colour")
             })
             add(Button("", fontIcon(MaterialDesignC.CURSOR_TEXT, 20)).apply {
                 tooltip = Tooltip("Move to Position")
