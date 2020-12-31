@@ -5,7 +5,7 @@
 }
 
 .root {
-    -fx-background-color: black;
+    -fx-background-color: #00447e;
 }
 
 .text {
@@ -18,6 +18,49 @@
 }
 
 .ikonli-font-icon {
+    -fx-icon-color: white;
+}
+
+/* ==================== Context Menus ==================== */
+
+.menu-item {
+    -fx-padding: 3 6 3 6;
+}
+
+.menu-item .text {
+    -fx-font-family: sans-serif;
+}
+
+.menu-item .label {
+    -fx-text-fill: #444;
+}
+
+.context-menu {
+    -fx-padding: 0;
+    -fx-background-color: #eee;
+    -fx-border-width: 1;
+    -fx-border-insets: 1;
+    -fx-border-color: #888;
+    -fx-background-insets: 1;
+    -fx-effect: none;
+}
+
+.context-menu .separator:horizontal .line {
+    -fx-border-color: #888;
+    -fx-border-insets: 0;
+    -fx-border-width: 0.3 0 0 0;
+}
+
+.menu-item:focused {
+    -fx-background-color: #5a8ade;
+    -fx-text-fill: white;
+}
+
+.menu-item:focused .label{
+    -fx-text-fill: white;
+}
+
+.menu-item:focused .ikonli-font-icon{
     -fx-icon-color: white;
 }
 
@@ -135,7 +178,7 @@
     -fx-border-width: 2;
     -fx-prompt-text-fill: #666;
     -fx-text-fill: white;
-    -fx-font-family: "Segoe UI", "Open Sans", "Arial", sans-serif;
+    -fx-font-family: sans-serif;
     -fx-font-weight: bold;
     -fx-border-insets: 0;
     -fx-background-insets: 0;
@@ -150,6 +193,7 @@
 }
 
 /* ==================== Radio Button ==================== */
+
 .radio-button {
     -fx-text-fill: white;
 }
@@ -168,4 +212,78 @@
     -fx-translate: 0;
     -fx-background-color: #fff000;
     -fx-background-insets: 1;
+}
+
+/* ==================== Choicebox ==================== */
+
+.choice-box {
+    -fx-border-width: 2;
+    -fx-border-color: #5a8ade;
+    -fx-background-color: #1e2e4a;
+    -fx-background-insets: 0;
+}
+
+.choice-box:focused {
+    -fx-border-color: #fff000;
+}
+
+.choice-box .arrow {
+    -fx-background-insets: 0;
+    -fx-background-color: white;
+}
+
+.choice-box .text {
+    -fx-font-family: sans-serif;
+}
+
+
+/* ==================== Color Picker ==================== */
+
+.color-picker {
+    -fx-border-width: 2;
+    -fx-border-color: #5a8ade;
+    -fx-background-color: #1e2e4a;
+    -fx-background-insets: 0;
+}
+
+.color-picker .text {
+    -fx-font-family: sans-serif;
+}
+
+.color-picker:focused {
+    -fx-border-color: #fff000;
+}
+
+.color-picker .arrow {
+    -fx-background-insets: 0;
+    -fx-background-color: white;
+}
+
+.color-palette {
+    -fx-focus-color: #5a8ade;
+    -fx-background-color: #eee;
+}
+
+.color-palette .label {
+    -fx-text-fill: white;
+}
+
+.custom-color-dialog {
+    -fx-background-color: #eee;
+}
+
+.custom-color-dialog .label {
+    -fx-text-fill: black;
+}
+
+.custom-color-dialog .button {
+    -fx-text-fill: black;
+}
+
+.custom-color-dialog .slider .track {
+    -fx-background-color: #888;
+}
+
+.custom-color-dialog .text {
+    -fx-font-family: sans-serif;
 }

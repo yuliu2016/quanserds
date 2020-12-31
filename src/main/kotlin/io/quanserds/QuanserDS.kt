@@ -10,6 +10,9 @@ import javafx.scene.Scene
 import javafx.scene.control.*
 import javafx.scene.image.Image
 import javafx.scene.image.ImageView
+import javafx.scene.input.KeyCode
+import javafx.scene.input.KeyCodeCombination
+import javafx.scene.input.KeyCombination
 import javafx.scene.text.Font
 import javafx.stage.Screen
 import javafx.stage.Stage
@@ -61,16 +64,9 @@ class QuanserDS : Application() {
                 add(toggleTab("QBot2e", MaterialDesignR.ROBOT_VACUUM, true))
                 add(toggleTab("Table", MaterialDesignF.FERRIS_WHEEL, true))
                 add(toggleTab("Autoclave", MaterialDesignF.FILE_CABINET, false))
-                add(toggleTab("Scale", MaterialDesignS.SCALE, false))
                 add(toggleTab("Autonomous", MaterialDesignC.CONSOLE_LINE, false))
 
                 hspace()
-
-                add(Button("", fontIcon(MaterialDesignS.SPIDER_WEB, 20)).also {
-                    it.tooltip = Tooltip("Show Threads")
-                    it.setOnMouseClicked { showThreads() }
-                    it.isVisible = false
-                })
 
                 add(Button("", fontIcon(MaterialDesignW.WINDOW_MINIMIZE, 20)).also {
                     it.tooltip = Tooltip("Minimize Window")
@@ -91,6 +87,9 @@ class QuanserDS : Application() {
                 add(AutoclavePanel().getNode())
             })
         }).apply {
+            accelerators[combo(KeyCode.T, control = true, shift = true)] = Runnable {
+                showThreads()
+            }
             stylesheets.addAll("/quanserds.css")
         }
         stage.width = bounds.width
