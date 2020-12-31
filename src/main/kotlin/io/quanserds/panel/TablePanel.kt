@@ -5,6 +5,7 @@ import io.quanserds.icon.fontIcon
 import javafx.geometry.HPos
 import javafx.geometry.Insets
 import javafx.geometry.Pos
+import javafx.scene.Node
 import javafx.scene.control.*
 import javafx.scene.layout.GridPane
 import org.kordamp.ikonli.materialdesign2.MaterialDesignF
@@ -14,12 +15,8 @@ import org.kordamp.ikonli.materialdesign2.MaterialDesignT
 
 class TablePanel : ControlPanel {
 
-    private val panel = vbox {
-        style = "-fx-background-color: #1e2e4a"
-        maxWidth = 360.0
+    private val leftPanel = vbox {
         spacing = 8.0
-        padding = Insets(8.0)
-
         add(hbox {
             align(Pos.CENTER_LEFT)
             spacing = 8.0
@@ -124,6 +121,31 @@ class TablePanel : ControlPanel {
             add(a)
             add(b)
         })
+    }
+
+    private val rightPanel = vbox {
+        spacing = 4.0
+        align(Pos.TOP_CENTER)
+        add(vertBox("Encoder", tf()))
+        add(vertBox("Angle", tf()))
+        add(vertBox("Mass", tf()))
+        add(vertBox("TOF", tf()))
+        add(vertBox("Scale", tf()))
+    }
+
+    private val megaPanel = vbox {
+        style = "-fx-background-color: #1e2e4a"
+        maxWidth = 360.0
+        spacing = 8.0
+        padding = Insets(8.0)
+
+
+        add(hbox {
+            spacing = 8.0
+            add(leftPanel)
+            add(rightPanel)
+            vgrow()
+        })
 
         add(hbox {
             align(Pos.CENTER_RIGHT)
@@ -150,6 +172,19 @@ class TablePanel : ControlPanel {
         })
     }
 
+    private fun tf() = textField {
+        text = "0"
+        isEditable = false
+        width(60.0)
+    }
+
+    private fun vertBox(title: String, vararg node: Node) = vbox {
+        spacing = 4.0
+        align(Pos.TOP_CENTER)
+        add(label(title))
+        node.forEach { add(it) }
+    }
+
     private fun gridLabel(text: String): Label {
         return label {
             this.text = text
@@ -157,5 +192,5 @@ class TablePanel : ControlPanel {
         }
     }
 
-    override fun getNode() = panel
+    override fun getNode() = megaPanel
 }

@@ -96,7 +96,7 @@ class QBot2ePanel : ControlPanel {
     }
 
     private val panel2 = vbox {
-        spacing = 8.0
+        spacing = 4.0
         align(Pos.TOP_CENTER)
         add(vertBox("Colour", hbox {
             height(4.0)
@@ -125,6 +125,7 @@ class QBot2ePanel : ControlPanel {
             spacing = 8.0
             add(mainPanel)
             add(panel2)
+            vgrow()
         })
 
         add(hbox {

@@ -23,7 +23,7 @@ class AutoclavePanel : ControlPanel {
         padding = Insets(8.0)
 
         add(gridPane {
-            vgap = 4.0
+            vgap = 8.0
             hgap = 8.0
             add(label("R"), 0, 0)
             add(label("G"), 0, 1)
