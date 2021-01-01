@@ -5,14 +5,43 @@ import io.quanserds.icon.fontIcon
 import javafx.geometry.HPos
 import javafx.geometry.Insets
 import javafx.geometry.Pos
+import javafx.geometry.VPos
 import javafx.scene.Node
+import javafx.scene.canvas.GraphicsContext
 import javafx.scene.control.Button
 import javafx.scene.control.Label
 import javafx.scene.control.Tooltip
 import javafx.scene.layout.GridPane
+import javafx.scene.paint.Color
+import javafx.scene.shape.ArcType
+import javafx.scene.shape.StrokeLineCap
 import org.kordamp.ikonli.materialdesign2.*
 
 class QBot2ePanel : ControlPanel {
+
+    private val cv = canvas {
+        this.height = 60.0
+        this.width = 60.0
+        graphicsContext2D.drawRobot(45.0)
+        this.translateX = 8.0
+        this.translateY = 8.0
+    }
+
+    private fun GraphicsContext.drawRobot(heading: Double) {
+        val startAngle = heading - 90.0
+        this.stroke = Color.ORANGE
+        lineWidth = 2.0
+        this.strokeOval(10.0, 10.0, 40.0, 40.0)
+        this.strokeOval(4.0, 4.0, 52.0, 52.0)
+
+        lineWidth = 6.0
+        lineCap = StrokeLineCap.BUTT
+        this.strokeArc(4.0, 4.0, 52.0, 52.0, startAngle % 360, 55.0, ArcType.OPEN)
+        stroke = Color.valueOf("#0f0")
+        this.strokeArc(4.0, 4.0, 52.0, 52.0, (startAngle + 65.0) % 360, 50.0, ArcType.OPEN)
+        stroke = Color.ORANGE
+        this.strokeArc(4.0, 4.0, 52.0, 52.0, (startAngle + 125.0) % 360, 55.0, ArcType.OPEN)
+    }
 
     private val mainPanel = vbox {
         spacing = 8.0
@@ -60,6 +89,7 @@ class QBot2ePanel : ControlPanel {
             add(label("Encoder"), 0, 2)
             add(tf(), 1, 2)
             add(tf(), 2, 2)
+            add(cv, 3, 0, 1, 3)
         })
 
         add(gridPane {

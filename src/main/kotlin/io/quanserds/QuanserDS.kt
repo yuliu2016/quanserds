@@ -51,7 +51,8 @@ class QuanserDS : Application() {
                     this.isSmooth = false
                 })
                 // Audiowide?
-                add(Label("Quanser Driver Station").apply {
+                add(Label("DS").apply {
+                    tooltip = Tooltip("Quanser Driver Station")
                     style = "-fx-font-size: 14"
                 })
 
@@ -59,12 +60,14 @@ class QuanserDS : Application() {
                     style = "-fx-text-fill: #0f0; -fx-font-size: 14"
                 })
 
+                hspace()
+
                 add(toggleTab("Connection", MaterialDesignA.ACCESS_POINT, true))
+                add(toggleTab("Retrace", MaterialDesignH.HISTORY, true))
                 add(toggleTab("QArm", MaterialDesignR.ROBOT_INDUSTRIAL, true))
                 add(toggleTab("QBot2e", MaterialDesignR.ROBOT_VACUUM, true))
                 add(toggleTab("Table", MaterialDesignF.FERRIS_WHEEL, true))
-                add(toggleTab("Autoclave", MaterialDesignF.FILE_CABINET, false))
-                add(toggleTab("Autonomous", MaterialDesignC.CONSOLE_LINE, false))
+                add(toggleTab("Autoclave", MaterialDesignF.FILE_CABINET, true))
 
                 hspace()
 
@@ -80,12 +83,13 @@ class QuanserDS : Application() {
             add(hbox {
                 vgrow()
                 spacing = 8.0
+                align(Pos.CENTER)
                 add(CommsPanel().getNode())
+                add(AutonPanel().getNode())
                 add(QArmPanel().getNode())
                 add(QBot2ePanel().getNode())
                 add(TablePanel().getNode())
                 add(AutoclavePanel().getNode())
-                add(AutonPanel().getNode())
             })
         }).apply {
             accelerators[combo(KeyCode.T, control = true, shift = true)] = Runnable {

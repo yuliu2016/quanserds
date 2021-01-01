@@ -16,7 +16,7 @@ import org.kordamp.ikonli.materialdesign2.MaterialDesignS
 
 class CommsPanel : ControlPanel {
     val panel = vbox {
-        maxWidth = 240.0
+        maxWidth = 200.0
         spacing = 8.0
 
         val img = Image(CommsPanel::class.java.getResourceAsStream("/fireball_dark.png"))
@@ -52,7 +52,7 @@ class CommsPanel : ControlPanel {
                 add(textField {
                     text = "localhost:18001"
                     isEditable = false
-                    width(150.0)
+                    width(120.0)
                 })
             })
 
@@ -66,7 +66,7 @@ class CommsPanel : ControlPanel {
                 add(textField {
                     text = "192.168.0.1:63345"
                     isEditable = false
-                    width(150.0)
+                    width(120.0)
                 })
             })
 
@@ -93,7 +93,7 @@ class CommsPanel : ControlPanel {
     }
 
     private fun commBox() = vbox {
-        prefWidth = 25.0
+        prefWidth = 20.0
         maxHeight = 10.0
         style = "-fx-background-color:red"
     }

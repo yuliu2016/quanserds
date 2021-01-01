@@ -40,17 +40,14 @@ class QArmPanel : ControlPanel {
             add(textField {
                 width(80.0)
                 text = "0.4064"
-                isEditable = false
             }, 0, 1)
             add(textField {
                 width(80.0)
                 text = "0.0000"
-                isEditable = false
             }, 1, 1)
             add(textField {
                 width(80.0)
                 text = "0.4826"
-                isEditable = false
             }, 2, 1)
         })
 
@@ -83,17 +80,11 @@ class QArmPanel : ControlPanel {
             add(Button("", fontIcon(MaterialDesignP.PALETTE_OUTLINE, 20)).apply {
                 tooltip = Tooltip("Change Base Colour")
             })
-            add(Button("", fontIcon(MaterialDesignC.CURSOR_TEXT, 20)).apply {
-                tooltip = Tooltip("Move to Position")
-            })
             add(Button("", fontIcon(MaterialDesignC.CALCULATOR, 20)).apply {
                 tooltip = Tooltip("QArm Math Calculator")
             })
             add(Button("", fontIcon(MaterialDesignI.INFORMATION_OUTLINE, 20)).apply {
                 tooltip = Tooltip("QArm Info")
-            })
-            add(Button("", fontIcon(MaterialDesignH.HISTORY, 20)).apply {
-                tooltip = Tooltip("Recent Positions")
             })
         })
     }

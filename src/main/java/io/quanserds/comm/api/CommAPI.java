@@ -9,7 +9,7 @@ import java.util.Arrays;
 
 import static io.quanserds.comm.api.CommUtil.*;
 
-@SuppressWarnings("unused")
+//@SuppressWarnings("unused")
 public class CommAPI {
     public static final int ID_QARM = 10;
     public static final int FCN_QARM_COMMAND_AND_REQUEST_STATE = 10;
@@ -207,7 +207,7 @@ public class CommAPI {
     }
 
     public static Container qbot2e_RequestRGB(int device_num) {
-        return container(ID_QBOT, device_num, FCN_QARM_REQUEST_RGB);
+        return container(ID_QBOT, device_num, FCN_QBOT_REQUEST_RGB);
     }
 
     public static Container qbot2e_RequestDepth(int device_num) {

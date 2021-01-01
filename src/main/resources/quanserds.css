@@ -161,18 +161,22 @@
     -fx-font-size: 14;
     -fx-padding: 2 8 4 8
 }
+/*
+.toggle-button .text {
+    -fx-font-family: sans-serif;
+}*/
 
 .toggle-button:hover {
     -fx-background-color: #5a8ade
 }
 
 .toggle-button:selected {
-    -fx-background-insets: 0, 0 -2 3 -2;
+    -fx-background-insets: 0, 0 -2 2 -2;
     -fx-background-color: #fff300, #1e2e4a;
 }
 
 .toggle-button:selected:hover {
-    -fx-background-insets: 0, 0 -2 3 -2;
+    -fx-background-insets: 0, 0 -2 2 -2;
     -fx-background-color: #fff300, #5a8ade;
 }
 
