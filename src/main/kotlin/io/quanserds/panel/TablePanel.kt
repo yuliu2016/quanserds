@@ -134,7 +134,7 @@ class TablePanel : ControlPanel {
     }
 
     private val megaPanel = vbox {
-        style = "-fx-background-color: #1e2e4a"
+        styleClass("modular-panel")
         maxWidth = 360.0
         spacing = 8.0
         padding = Insets(8.0)

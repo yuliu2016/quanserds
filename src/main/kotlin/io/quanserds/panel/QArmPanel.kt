@@ -18,7 +18,7 @@ import org.kordamp.ikonli.materialdesign2.MaterialDesignP
 class QArmPanel : ControlPanel {
 
     private val panel = vbox {
-        style = "-fx-background-color: #1e2e4a"
+        styleClass("modular-panel")
         maxWidth = 280.0
         spacing = 8.0
         padding = Insets(8.0)

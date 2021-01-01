@@ -85,6 +85,7 @@ class QuanserDS : Application() {
                 add(QBot2ePanel().getNode())
                 add(TablePanel().getNode())
                 add(AutoclavePanel().getNode())
+                add(AutonPanel().getNode())
             })
         }).apply {
             accelerators[combo(KeyCode.T, control = true, shift = true)] = Runnable {

@@ -21,7 +21,7 @@ class CommsPanel : ControlPanel {
 
         val img = Image(CommsPanel::class.java.getResourceAsStream("/fireball_dark.png"))
         add(vbox {
-            style = "-fx-background-color: #1e2e4a"
+            styleClass("modular-panel")
             vgrow()
             align(Pos.TOP_CENTER)
             spacing = 8.0
@@ -80,7 +80,7 @@ class CommsPanel : ControlPanel {
             })
         })
         add(vbox {
-            style = "-fx-background-color: #1e2e4a"
+            styleClass("modular-panel")
             prefHeight = 70.0
             padding = Insets(0.0, 8.0, 0.0, 8.0)
             align(Pos.CENTER)

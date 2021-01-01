@@ -17,7 +17,7 @@ import org.kordamp.ikonli.materialdesign2.MaterialDesignT
 class AutoclavePanel : ControlPanel {
 
     private val panel = vbox {
-        style = "-fx-background-color: #1e2e4a"
+        styleClass("modular-panel")
         maxWidth = 300.0
         spacing = 8.0
         padding = Insets(8.0)

@@ -116,7 +116,7 @@ class QBot2ePanel : ControlPanel {
 
     private val megaPanel = vbox {
 
-        style = "-fx-background-color: #1e2e4a"
+        styleClass("modular-panel")
         maxWidth = 460.0
         spacing = 8.0
         padding = Insets(8.0)
