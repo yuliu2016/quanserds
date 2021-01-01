@@ -2,7 +2,6 @@ package io.quanserds.panel
 
 import io.quanserds.ControlPanel
 import io.quanserds.DSManager
-import io.quanserds.comm.api.CommAPI
 import io.quanserds.comm.api.Container
 import io.quanserds.fx.*
 import io.quanserds.icon.fontIcon
