@@ -1,5 +1,9 @@
 package io.quanserds.panel
 
+import io.quanserds.ControlPanel
+import io.quanserds.DSManager
+import io.quanserds.comm.api.CommAPI
+import io.quanserds.comm.api.Container
 import io.quanserds.fx.*
 import io.quanserds.icon.fontIcon
 import javafx.geometry.HPos
@@ -14,6 +18,23 @@ import org.kordamp.ikonli.materialdesign2.MaterialDesignR
 import org.kordamp.ikonli.materialdesign2.MaterialDesignT
 
 class TablePanel : ControlPanel {
+
+    override val name = "Table"
+    override val icon = MaterialDesignF.FERRIS_WHEEL
+
+    override val mailFilter = listOf(CommAPI.ID_SRV02BOTTLETABLE, CommAPI.ID_SCALE)
+
+    override fun periodicRequestData() {
+    }
+
+    private lateinit var dsManager: DSManager
+
+    override fun accept(manager: DSManager) {
+        dsManager = manager
+    }
+
+    override fun periodicResponseData(containers: List<Container>) {
+    }
 
     private val leftPanel = vbox {
         spacing = 8.0

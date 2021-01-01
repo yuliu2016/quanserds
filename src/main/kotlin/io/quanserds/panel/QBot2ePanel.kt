@@ -1,16 +1,20 @@
 package io.quanserds.panel
 
+import io.quanserds.ControlPanel
+import io.quanserds.DSManager
+import io.quanserds.comm.api.CommAPI
+import io.quanserds.comm.api.Container
 import io.quanserds.fx.*
 import io.quanserds.icon.fontIcon
 import javafx.geometry.HPos
 import javafx.geometry.Insets
 import javafx.geometry.Pos
-import javafx.geometry.VPos
 import javafx.scene.Node
 import javafx.scene.canvas.GraphicsContext
 import javafx.scene.control.Button
 import javafx.scene.control.Label
 import javafx.scene.control.Tooltip
+import javafx.scene.input.KeyEvent
 import javafx.scene.layout.GridPane
 import javafx.scene.paint.Color
 import javafx.scene.shape.ArcType
@@ -18,6 +22,28 @@ import javafx.scene.shape.StrokeLineCap
 import org.kordamp.ikonli.materialdesign2.*
 
 class QBot2ePanel : ControlPanel {
+
+
+    override val name = "QBot2e"
+    override val icon = MaterialDesignR.ROBOT_VACUUM
+
+    override val mailFilter = listOf(CommAPI.ID_QBOT, CommAPI.ID_QBOT_BOX)
+
+    override fun periodicRequestData() {
+    }
+
+    private lateinit var dsManager: DSManager
+
+    override fun accept(manager: DSManager) {
+        dsManager = manager
+    }
+
+    override fun onKeyPressed(e: KeyEvent) {
+        // do nothing
+    }
+
+    override fun periodicResponseData(containers: List<Container>) {
+    }
 
     private val cv = canvas {
         this.height = 60.0
@@ -36,10 +62,9 @@ class QBot2ePanel : ControlPanel {
 
         lineWidth = 6.0
         lineCap = StrokeLineCap.BUTT
-        this.strokeArc(4.0, 4.0, 52.0, 52.0, startAngle % 360, 55.0, ArcType.OPEN)
         stroke = Color.valueOf("#0f0")
+        this.strokeArc(4.0, 4.0, 52.0, 52.0, startAngle % 360, 55.0, ArcType.OPEN)
         this.strokeArc(4.0, 4.0, 52.0, 52.0, (startAngle + 65.0) % 360, 50.0, ArcType.OPEN)
-        stroke = Color.ORANGE
         this.strokeArc(4.0, 4.0, 52.0, 52.0, (startAngle + 125.0) % 360, 55.0, ArcType.OPEN)
     }
 

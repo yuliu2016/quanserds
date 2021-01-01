@@ -1,19 +1,37 @@
 package io.quanserds.panel
 
+import io.quanserds.ControlPanel
+import io.quanserds.DSManager
+import io.quanserds.comm.api.CommAPI
+import io.quanserds.comm.api.Container
 import io.quanserds.fx.*
 import io.quanserds.icon.fontIcon
 import javafx.geometry.Insets
 import javafx.geometry.Pos
-import javafx.scene.Node
 import javafx.scene.control.Button
-import org.kordamp.ikonli.materialdesign2.MaterialDesignL
-import org.kordamp.ikonli.materialdesign2.MaterialDesignP
-import org.kordamp.ikonli.materialdesign2.MaterialDesignR
+import org.kordamp.ikonli.materialdesign2.*
 import kotlin.math.round
 
 class AutonPanel : ControlPanel {
 
-    val panel = vbox {
+    override val name = "Retrace"
+    override val icon = MaterialDesignH.HISTORY
+
+    override val mailFilter = listOf<Int>()
+
+    override fun periodicRequestData() {
+    }
+
+    private lateinit var dsManager: DSManager
+
+    override fun accept(manager: DSManager) {
+        dsManager = manager
+    }
+
+    override fun periodicResponseData(containers: List<Container>) {
+    }
+
+    private val panel = vbox {
         styleClass("modular-panel")
         maxWidth = 300.0
         spacing = 8.0

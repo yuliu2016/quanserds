@@ -1,5 +1,9 @@
 package io.quanserds.panel
 
+import io.quanserds.ControlPanel
+import io.quanserds.DSManager
+import io.quanserds.comm.api.CommAPI
+import io.quanserds.comm.api.Container
 import io.quanserds.fx.*
 import io.quanserds.icon.fontIcon
 import javafx.geometry.HPos
@@ -10,12 +14,26 @@ import javafx.scene.control.Button
 import javafx.scene.control.Label
 import javafx.scene.control.Tooltip
 import javafx.scene.layout.GridPane
-import org.kordamp.ikonli.materialdesign2.MaterialDesignC
-import org.kordamp.ikonli.materialdesign2.MaterialDesignH
-import org.kordamp.ikonli.materialdesign2.MaterialDesignI
-import org.kordamp.ikonli.materialdesign2.MaterialDesignP
+import org.kordamp.ikonli.materialdesign2.*
 
 class QArmPanel : ControlPanel {
+
+    override val name = "QArm"
+    override val icon = MaterialDesignR.ROBOT_INDUSTRIAL
+
+    override val mailFilter = listOf(CommAPI.ID_QARM)
+
+    override fun periodicRequestData() {
+    }
+
+    private lateinit var dsManager: DSManager
+
+    override fun accept(manager: DSManager) {
+        dsManager = manager
+    }
+
+    override fun periodicResponseData(containers: List<Container>) {
+    }
 
     private val panel = vbox {
         styleClass("modular-panel")

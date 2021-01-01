@@ -1,10 +1,13 @@
 package io.quanserds.panel
 
+import io.quanserds.ControlPanel
+import io.quanserds.DSManager
+import io.quanserds.comm.api.CommAPI
+import io.quanserds.comm.api.Container
 import io.quanserds.fx.*
 import io.quanserds.icon.fontIcon
 import javafx.geometry.Insets
 import javafx.geometry.Pos
-import javafx.scene.Node
 import javafx.scene.control.Button
 import javafx.scene.control.Label
 import javafx.scene.image.Image
@@ -15,6 +18,28 @@ import org.kordamp.ikonli.materialdesign2.MaterialDesignR
 import org.kordamp.ikonli.materialdesign2.MaterialDesignS
 
 class CommsPanel : ControlPanel {
+
+    override val name = "Connection"
+    override val icon = MaterialDesignA.ACCESS_POINT
+
+    override val mailFilter = listOf<Int>()
+
+    override fun periodicRequestData() {
+    }
+
+    private lateinit var dsManager: DSManager
+
+    override fun accept(manager: DSManager) {
+        dsManager = manager
+    }
+
+    override fun periodicResponseData(containers: List<Container>) {
+    }
+
+    override fun onConnectionStatus(pings: BooleanArray, server: String, client: String) {
+
+    }
+
     val panel = vbox {
         maxWidth = 200.0
         spacing = 8.0

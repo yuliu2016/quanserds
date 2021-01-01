@@ -20,6 +20,16 @@ import org.kordamp.ikonli.Ikon
 import org.kordamp.ikonli.materialdesign2.*
 
 class QuanserDS : Application() {
+
+    private val panels = listOf(
+        CommsPanel(),
+        AutonPanel(),
+        QArmPanel(),
+        QBot2ePanel(),
+        TablePanel(),
+        AutoclavePanel()
+    )
+
     override fun start(stage: Stage) {
 
         Font.loadFont(
@@ -61,12 +71,9 @@ class QuanserDS : Application() {
 
                 hspace()
 
-                add(toggleTab("Connection", MaterialDesignA.ACCESS_POINT, true))
-                add(toggleTab("Retrace", MaterialDesignH.HISTORY, true))
-                add(toggleTab("QArm", MaterialDesignR.ROBOT_INDUSTRIAL, true))
-                add(toggleTab("QBot2e", MaterialDesignR.ROBOT_VACUUM, true))
-                add(toggleTab("Table", MaterialDesignF.FERRIS_WHEEL, true))
-                add(toggleTab("Autoclave", MaterialDesignF.FILE_CABINET, true))
+                for (panel in panels) {
+                    add(toggleTab(panel.name, panel.icon, true))
+                }
 
                 hspace()
 
@@ -83,12 +90,9 @@ class QuanserDS : Application() {
                 vgrow()
                 spacing = 8.0
                 align(Pos.CENTER)
-                add(CommsPanel().getNode())
-                add(AutonPanel().getNode())
-                add(QArmPanel().getNode())
-                add(QBot2ePanel().getNode())
-                add(TablePanel().getNode())
-                add(AutoclavePanel().getNode())
+                for (panel in panels) {
+                    add(panel.getNode())
+                }
             })
         }).apply {
             accelerators[combo(KeyCode.T, control = true, shift = true)] = Runnable {
@@ -96,6 +100,13 @@ class QuanserDS : Application() {
             }
             accelerators[combo(KeyCode.I, control = true, shift = true)] = Runnable {
                 showInfo(stage, ic)
+            }
+            setOnKeyPressed {
+                it?.let { e ->
+                    for (panel in panels) {
+                        panel.onKeyPressed(e)
+                    }
+                }
             }
             stylesheets.addAll("/quanserds.css")
         }
