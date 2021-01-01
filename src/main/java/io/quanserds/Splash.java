@@ -27,6 +27,7 @@ public class Splash {
     private static Label labelOf(String s) {
         Label label = new Label(s);
         label.setStyle("-fx-text-fill: white");
+        label.getStyleClass().add("normalize-text");
         return label;
     }
 
@@ -53,8 +54,9 @@ public class Splash {
         icon.setPreserveRatio(true);
         icon.setFitHeight(72.0);
 
-        Label label = new Label("notBook");
-        label.setStyle("-fx-font-size: 72;-fx-font-weight:normal;-fx-text-fill: white");
+        Label label = new Label("Driver Station");
+        label.setStyle("-fx-font-size: 28;-fx-font-weight:normal;-fx-text-fill: white");
+        label.getStyleClass().add("normalize-text");
         top.getChildren().addAll(icon, label);
 
         VBox bottom = new VBox();

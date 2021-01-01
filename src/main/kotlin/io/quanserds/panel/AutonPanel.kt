@@ -29,10 +29,9 @@ class AutonPanel : ControlPanel {
                 val a = round(Math.random() * 100) / 100
                 val b = round(Math.random() * 100) / 100
                 val c = round(Math.random() * 100) / 100
-                items.add("QArm Move ($a, $b, $c)")
+                items.add("Arm: ($a, $b, $c)")
             }
-            items.addAll("QArm Move (1,2,3)")
-            width(140.0)
+            width(200.0)
         })
 
         vspace()

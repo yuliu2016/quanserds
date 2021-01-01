@@ -11,12 +11,11 @@ import javafx.scene.control.*
 import javafx.scene.image.Image
 import javafx.scene.image.ImageView
 import javafx.scene.input.KeyCode
-import javafx.scene.input.KeyCodeCombination
-import javafx.scene.input.KeyCombination
 import javafx.scene.text.Font
 import javafx.stage.Screen
 import javafx.stage.Stage
 import javafx.stage.StageStyle
+import javafx.stage.Window
 import org.kordamp.ikonli.Ikon
 import org.kordamp.ikonli.materialdesign2.*
 
@@ -95,6 +94,9 @@ class QuanserDS : Application() {
             accelerators[combo(KeyCode.T, control = true, shift = true)] = Runnable {
                 showThreads()
             }
+            accelerators[combo(KeyCode.I, control = true, shift = true)] = Runnable {
+                showInfo(stage, ic)
+            }
             stylesheets.addAll("/quanserds.css")
         }
         stage.width = bounds.width
@@ -109,6 +111,10 @@ class QuanserDS : Application() {
             "$name Priority:${it.priority}  Daemon:${it.isDaemon}  Group:${it.threadGroup.name}"
         }
         Splash.alert(null, "Threads", t, true)
+    }
+
+    private fun showInfo(window: Window, icon: Image) {
+        Splash.info(window, BuildConfig.kVersion, icon)
     }
 
     private fun toggleTab(text: String, icon: Ikon, selected: Boolean) =
