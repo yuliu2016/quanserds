@@ -1,6 +1,7 @@
 package io.quanserds
 
 import io.quanserds.comm.api.Container
+import io.quanserds.command.Command
 import javafx.scene.Node
 import javafx.scene.input.KeyEvent
 import org.kordamp.ikonli.Ikon
@@ -24,7 +25,9 @@ interface ControlPanel {
     }
 
     fun onConnectionStatus(pings: BooleanArray, server: String, client: String) {
+    }
 
+    fun onCommandSubmitted(command: Command) {
     }
 
     /**
