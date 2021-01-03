@@ -24,9 +24,7 @@ class Scheduler(private val panels: List<ControlPanel>) : DSManager {
 
     private val commands = mutableListOf<Command>()
 
-    private val pings = mutableListOf<Boolean>()
-    private val pingsArray = BooleanArray(5)
-
+    private val pings = MutableList(5) { CommLevel.NoConnection }
 
     init {
         panels.forEach { it.accept(this) }
@@ -39,16 +37,11 @@ class Scheduler(private val panels: List<ControlPanel>) : DSManager {
         timer.scheduleAtFixedRate(0L, kUpdateRate) { periodicUpdate() }
     }
 
-    private fun updatePingStatus(connected: Boolean) {
-        pings.add(connected)
-        if (pings.size > 5) {
-            pings.removeAt(0)
-        }
-        for (i in 0 until 5) {
-            pingsArray[i] = pings.getOrNull(i) ?: false
-        }
+    private fun updatePingStatus(commLevel: CommLevel) {
+        pings.add(commLevel)
+        pings.removeAt(0)
         panels.forEach {
-            it.onConnectionStatus(state, pingsArray, client)
+            it.onConnectionStatus(state, pings, client)
         }
     }
 
@@ -64,7 +57,7 @@ class Scheduler(private val panels: List<ControlPanel>) : DSManager {
         if (commServer.acceptAsynchronously()) {
             // Established a connection; begin to read data
             client = commServer.clientAddress
-            updatePingStatus(true)
+            updatePingStatus(CommLevel.Data)
             state = Connected
         }
     }
@@ -74,10 +67,14 @@ class Scheduler(private val panels: List<ControlPanel>) : DSManager {
         if (commServer.receiveNewData()) {
             val containers = commServer.receivedContainers
             parseContainers(containers)
-            // Even if there are no containers, it's still new data
-            updatePingStatus(true)
+
+            if (containers.isEmpty()) {
+                updatePingStatus(CommLevel.NoData)
+            } else {
+                updatePingStatus(CommLevel.Data)
+            }
         } else {
-            updatePingStatus(false)
+            updatePingStatus(CommLevel.NoData)
         }
 
         // Step 2 - Add all requests for data
@@ -104,7 +101,7 @@ class Scheduler(private val panels: List<ControlPanel>) : DSManager {
     }
 
     private fun periodicUpdateDisconnected() {
-        // history of the entire do nothing i guess
+        updatePingStatus(CommLevel.NoConnection)
     }
 
     override fun mail(container: Container) {
@@ -124,6 +121,7 @@ class Scheduler(private val panels: List<ControlPanel>) : DSManager {
         // context-switch to comms thread with delay 0
         timer.schedule(0L) {
             disconnectAll()
+            updatePingStatus(CommLevel.NoConnection)
         }
     }
 
@@ -142,6 +140,10 @@ class Scheduler(private val panels: List<ControlPanel>) : DSManager {
     }
 
     override fun restartConnection() {
+        if (state != Disconnected) {
+            // incorrect state
+            return
+        }
         // context-switch to comms thread with delay 0
         timer.schedule(0L) {
             commServer.connect(false)

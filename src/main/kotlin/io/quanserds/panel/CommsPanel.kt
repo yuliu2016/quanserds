@@ -1,5 +1,7 @@
 package io.quanserds.panel
 
+import io.quanserds.CommLevel
+import io.quanserds.CommLevel.*
 import io.quanserds.ConnectionState
 import io.quanserds.ConnectionState.*
 import io.quanserds.ControlPanel
@@ -70,7 +72,7 @@ class CommsPanel : ControlPanel {
         }
     }
 
-    override fun onConnectionStatus(state: ConnectionState, pings: BooleanArray, client: String) {
+    override fun onConnectionStatus(state: ConnectionState, pings: List<CommLevel>, client: String) {
         Platform.runLater {
             clientBox.text = client
             commState.text = when (state) {
@@ -80,8 +82,9 @@ class CommsPanel : ControlPanel {
             }
             for (i in 0 until 5) {
                 commBoxes[i].style = when (pings[i]) {
-                    true -> "-fx-background-color:#0f0"
-                    false -> "-fx-background-color:red"
+                    Data -> "-fx-background-color:#0f0"
+                    NoData -> "-fx-background-color:#f80"
+                    NoConnection -> "-fx-background-color:#f00"
                 }
             }
         }

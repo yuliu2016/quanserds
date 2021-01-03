@@ -59,6 +59,10 @@ public class Stream implements AutoCloseable {
                 clientChannel.close();
                 clientChannel = null;
             }
+
+            // ensure that there can be a reconnection later
+            acceptFuture = null;
+
             if (stopServer) {
                 serverChannel.close();
             }

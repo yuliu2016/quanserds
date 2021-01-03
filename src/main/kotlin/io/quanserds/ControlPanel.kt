@@ -35,7 +35,7 @@ interface ControlPanel {
      * [javafx.application.Platform.runLater] to modify
      * the UI
      */
-    fun onConnectionStatus(state: ConnectionState, pings: BooleanArray, client: String) {
+    fun onConnectionStatus(state: ConnectionState, pings: List<CommLevel>, client: String) {
     }
 
     /**
