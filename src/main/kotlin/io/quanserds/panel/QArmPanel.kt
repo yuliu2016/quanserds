@@ -6,12 +6,10 @@ import io.quanserds.comm.api.CommAPI
 import io.quanserds.comm.api.Container
 import io.quanserds.fx.*
 import io.quanserds.icon.fontIcon
-import javafx.geometry.HPos
 import javafx.geometry.Insets
 import javafx.geometry.Pos
 import javafx.scene.Node
 import javafx.scene.control.Button
-import javafx.scene.control.Label
 import javafx.scene.control.Tooltip
 import javafx.scene.layout.GridPane
 import org.kordamp.ikonli.materialdesign2.*
@@ -112,13 +110,6 @@ class QArmPanel : ControlPanel {
             height(4.0)
             width(56.0)
             style = "-fx-background-color: orange; -fx-rotate: $rotate;"
-        }
-    }
-
-    private fun gridLabel(text: String): Label {
-        return label {
-            this.text = text
-            GridPane.setHalignment(this, HPos.CENTER)
         }
     }
 

@@ -2,20 +2,19 @@ package io.quanserds.panel
 
 import io.quanserds.ControlPanel
 import io.quanserds.DSManager
-import io.quanserds.comm.api.CommAPI
+import io.quanserds.comm.api.CommAPI.*
 import io.quanserds.comm.api.Container
+import io.quanserds.comm.struct.QBot2eState
 import io.quanserds.fx.*
 import io.quanserds.icon.fontIcon
-import javafx.geometry.HPos
+import javafx.application.Platform
 import javafx.geometry.Insets
 import javafx.geometry.Pos
-import javafx.scene.Node
 import javafx.scene.canvas.GraphicsContext
 import javafx.scene.control.Button
 import javafx.scene.control.Label
 import javafx.scene.control.Tooltip
 import javafx.scene.input.KeyEvent
-import javafx.scene.layout.GridPane
 import javafx.scene.paint.Color
 import javafx.scene.shape.ArcType
 import javafx.scene.shape.StrokeLineCap
@@ -23,14 +22,16 @@ import org.kordamp.ikonli.materialdesign2.*
 
 class QBot2ePanel : ControlPanel {
 
+    companion object {
+        const val kD = 0
+    }
+
 
     override val name = "QBot2e"
     override val icon = MaterialDesignR.ROBOT_VACUUM
 
-    override val mailFilter = listOf(CommAPI.ID_QBOT, CommAPI.ID_QBOT_BOX)
+    override val mailFilter = listOf(ID_QBOT, ID_QBOT_BOX)
 
-    override fun periodicRequestData() {
-    }
 
     private lateinit var dsManager: DSManager
 
@@ -38,11 +39,28 @@ class QBot2ePanel : ControlPanel {
         dsManager = manager
     }
 
+    override fun periodicRequestData() {
+        val ds = dsManager
+        ds.postMail(qbot2e_CommandAndRequestState(kD, 0.05f, (Math.random() - 0.5).toFloat() * 2))
+    }
+
     override fun onKeyPressed(e: KeyEvent) {
         // do nothing
     }
 
     override fun periodicResponseData(containers: List<Container>) {
+        containers.forEach { it.parse() }
+    }
+
+    private fun Container.parse() {
+        when (deviceFunction) {
+            FCN_QBOT_RESPONSE_STATE -> {
+                val state = qbot2e_ResponseState(this)
+                Platform.runLater {
+                    updateQBotState(state)
+                }
+            }
+        }
     }
 
     private val cv = canvas {
@@ -66,6 +84,44 @@ class QBot2ePanel : ControlPanel {
         this.strokeArc(4.0, 4.0, 52.0, 52.0, startAngle % 360, 55.0, ArcType.OPEN)
         this.strokeArc(4.0, 4.0, 52.0, 52.0, (startAngle + 65.0) % 360, 50.0, ArcType.OPEN)
         this.strokeArc(4.0, 4.0, 52.0, 52.0, (startAngle + 125.0) % 360, 55.0, ArcType.OPEN)
+    }
+
+    private val wx = tf()
+    private val wy = tf()
+    private val wz = tf()
+    private val fx = tf()
+    private val fy = tf()
+    private val fz = tf()
+    private val ux = tf()
+    private val uy = tf()
+    private val uz = tf()
+
+    private val vl = tf()
+    private val vr = tf()
+    private val el = tf()
+    private val er = tf()
+
+    private val co = tf()
+    private val de = tf()
+    private val he = tf()
+    private val gy = tf()
+
+    private fun updateQBotState(s: QBot2eState) {
+        wx.text = s.world_x.f
+        wy.text = s.world_y.f
+        wz.text = s.world_z.f
+        fx.text = s.forward_x.f
+        fy.text = s.forward_y.f
+        fz.text = s.forward_z.f
+        ux.text = s.up_x.f
+        uy.text = s.up_y.f
+        uz.text = s.up_z.f
+
+        el.text = s.encoder_left.toString()
+        er.text = s.encoder_right.toString()
+
+        he.text = s.heading.f
+        gy.text = s.gyro.f
     }
 
     private val mainPanel = vbox {
@@ -109,11 +165,11 @@ class QBot2ePanel : ControlPanel {
             add(label("Left").gridCenter(), 1, 0)
             add(label("Right").gridCenter(), 2, 0)
             add(label("Velocity"), 0, 1)
-            add(tf(), 1, 1)
-            add(tf(), 2, 1)
+            add(vl, 1, 1)
+            add(vr, 2, 1)
             add(label("Encoder"), 0, 2)
-            add(tf(), 1, 2)
-            add(tf(), 2, 2)
+            add(el, 1, 2)
+            add(er, 2, 2)
             add(cv, 3, 0, 1, 3)
         })
 
@@ -124,30 +180,20 @@ class QBot2ePanel : ControlPanel {
             add(label("y").gridCenter(), 2, 0)
             add(label("z").gridCenter(), 3, 0)
             add(label("World"), 0, 1)
-            add(tf(), 1, 1)
-            add(tf(), 2, 1)
-            add(tf(), 3, 1)
+            add(wx, 1, 1)
+            add(wy, 2, 1)
+            add(wz, 3, 1)
             add(label("Forward"), 0, 2)
-            add(tf(), 1, 2)
-            add(tf(), 2, 2)
-            add(tf(), 3, 2)
+            add(fx, 1, 2)
+            add(fy, 2, 2)
+            add(fz, 3, 2)
             add(label("Up"), 0, 3)
-            add(tf(), 1, 3)
-            add(tf(), 2, 3)
-            add(tf(), 3, 3)
+            add(ux, 1, 3)
+            add(uy, 2, 3)
+            add(uz, 3, 3)
         })
 
         vspace()
-    }
-
-    private fun Node.gridCenter() = apply {
-        GridPane.setHalignment(this, HPos.CENTER)
-    }
-
-    private fun tf() = textField {
-        text = "0"
-        isEditable = false
-        width(60.0)
     }
 
     private val panel2 = vbox {
@@ -156,17 +202,10 @@ class QBot2ePanel : ControlPanel {
         add(vertBox("Colour", hbox {
             height(4.0)
             style = "-fx-background-color: #ffdc0c"
-        }, tf()))
-        add(vertBox("Depth", tf()))
-        add(vertBox("Heading", tf()))
-        add(vertBox("Gyro", tf()))
-    }
-
-    private fun vertBox(title: String, vararg node: Node) = vbox {
-        spacing = 4.0
-        align(Pos.TOP_CENTER)
-        add(label(title))
-        node.forEach { add(it) }
+        }, co))
+        add(vertBox("Depth", de))
+        add(vertBox("Heading", he))
+        add(vertBox("Gyro", gy))
     }
 
     private val megaPanel = vbox {

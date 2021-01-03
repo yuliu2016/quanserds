@@ -13,7 +13,7 @@ class Scheduler(private val panels: List<ControlPanel>) : DSManager {
 
     companion object {
         const val kPort = 18001
-        const val kUpdateRate = 1000L // millis
+        const val kUpdateRate = 500L // millis
     }
 
     private val commServer = ModularServer(kPort)
@@ -62,7 +62,7 @@ class Scheduler(private val panels: List<ControlPanel>) : DSManager {
         if (commServer.acceptAsynchronously()) {
             // Established a connection; begin to read data
             client = commServer.clientAddress
-            updatePingStatus(CommLevel.Data)
+            updatePingStatus(CommLevel.NoData)
             state = Connected
         }
     }
@@ -109,7 +109,7 @@ class Scheduler(private val panels: List<ControlPanel>) : DSManager {
         updatePingStatus(CommLevel.NoConnection)
     }
 
-    override fun mail(container: Container) {
+    override fun postMail(container: Container) {
         // must run on the scheduler thread
         commServer.queueContainer(container)
     }

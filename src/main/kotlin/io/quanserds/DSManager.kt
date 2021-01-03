@@ -12,7 +12,7 @@ interface DSManager {
      * [ControlPanel.periodicRequestData], which
      * are guaranteed to run on the scheduler thread
      */
-    fun mail(container: Container)
+    fun postMail(container: Container)
 
     /**
      * Thread safe; submit a command for running

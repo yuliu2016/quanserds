@@ -6,12 +6,9 @@ import io.quanserds.comm.api.CommAPI
 import io.quanserds.comm.api.Container
 import io.quanserds.fx.*
 import io.quanserds.icon.fontIcon
-import javafx.geometry.HPos
 import javafx.geometry.Insets
 import javafx.geometry.Pos
-import javafx.scene.Node
 import javafx.scene.control.*
-import javafx.scene.layout.GridPane
 import org.kordamp.ikonli.materialdesign2.MaterialDesignF
 import org.kordamp.ikonli.materialdesign2.MaterialDesignI
 import org.kordamp.ikonli.materialdesign2.MaterialDesignR
@@ -191,26 +188,6 @@ class TablePanel : ControlPanel {
                 tooltip = Tooltip("SRV03 Bottle Table Info")
             })
         })
-    }
-
-    private fun tf() = textField {
-        text = "0"
-        isEditable = false
-        width(60.0)
-    }
-
-    private fun vertBox(title: String, vararg node: Node) = vbox {
-        spacing = 4.0
-        align(Pos.TOP_CENTER)
-        add(label(title))
-        node.forEach { add(it) }
-    }
-
-    private fun gridLabel(text: String): Label {
-        return label {
-            this.text = text
-            GridPane.setHalignment(this, HPos.CENTER)
-        }
     }
 
     override fun getNode() = megaPanel
