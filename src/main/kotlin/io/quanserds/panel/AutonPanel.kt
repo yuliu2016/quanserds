@@ -3,6 +3,7 @@ package io.quanserds.panel
 import io.quanserds.ControlPanel
 import io.quanserds.DSManager
 import io.quanserds.comm.api.Container
+import io.quanserds.command.Command
 import io.quanserds.fx.*
 import io.quanserds.icon.fontIcon
 import javafx.geometry.Insets
@@ -30,6 +31,9 @@ class AutonPanel : ControlPanel {
     }
 
     override fun periodicResponseData(containers: List<Container>) {
+    }
+
+    override fun onCommandSubmitted(command: Command) {
     }
 
     private val panel = vbox {

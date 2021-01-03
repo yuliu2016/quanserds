@@ -86,13 +86,27 @@ public class Stream implements AutoCloseable {
         return addr;
     }
 
-    public boolean waitToAccept(int timeoutSeconds) {
+    public boolean acceptAsynchronously() {
+        return acceptWithTimeout(-1);
+    }
+
+    public boolean acceptWithTimeout(int timeoutSeconds) {
         if (clientChannel != null) {
             throw new IllegalStateException("Cannot wait to accept when there's already a client");
         }
 
         try {
-            clientChannel = acceptFuture.get(timeoutSeconds, TimeUnit.SECONDS);
+            if (timeoutSeconds > 0) {
+                // Synchronous: Wait for a certain number of seconds before returning
+                clientChannel = acceptFuture.get(timeoutSeconds, TimeUnit.SECONDS);
+            } else {
+                // Asynchronous: Returns immediately if it's done
+                if (acceptFuture.isDone()) {
+                    clientChannel = acceptFuture.get();
+                } else {
+                    return false;
+                }
+            }
 
             boolean accepted = clientChannel != null && clientChannel.isOpen();
             if (accepted) {

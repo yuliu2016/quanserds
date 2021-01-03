@@ -25,19 +25,25 @@ public class ModularServer implements AutoCloseable {
         serverStream = new Stream(port, readBuffer);
     }
 
-    public void connect() {
+    public void connect(boolean synchronousAccept) {
         serverStream.connect();
+
+        if (!synchronousAccept) return;
 
         System.out.println("Waiting for simulation to connect...");
 
         while (true) {
-            if (serverStream.waitToAccept(3)) {
+            if (serverStream.acceptWithTimeout(3)) {
                 break;
             }
         }
 
         System.out.println("Connection accepted");
         System.out.println("Simulation connected");
+    }
+
+    public boolean acceptAsynchronously() {
+        return serverStream.acceptAsynchronously();
     }
 
     public void disconnect() {

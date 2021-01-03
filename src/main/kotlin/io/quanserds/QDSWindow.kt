@@ -20,11 +20,7 @@ import org.kordamp.ikonli.materialdesign2.MaterialDesignW
 
 class QDSWindow(private val stage: Stage, private val panels: List<ControlPanel>) {
 
-    private val scheduler = Scheduler()
-
-    init {
-        scheduler.acceptAll(panels)
-    }
+    private val scheduler = Scheduler(panels)
 
     private val appIcon = Image(QuanserDS::class.java.getResourceAsStream("/icon.png"))
 
