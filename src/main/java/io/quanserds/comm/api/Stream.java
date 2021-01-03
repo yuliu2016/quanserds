@@ -95,6 +95,10 @@ public class Stream implements AutoCloseable {
             throw new IllegalStateException("Cannot wait to accept when there's already a client");
         }
 
+        if (acceptFuture == null) {
+            throw new IllegalStateException("Nothing to accept in the future");
+        }
+
         try {
             if (timeoutSeconds > 0) {
                 // Synchronous: Wait for a certain number of seconds before returning

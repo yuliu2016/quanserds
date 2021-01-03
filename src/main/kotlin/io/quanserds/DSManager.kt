@@ -14,9 +14,14 @@ interface DSManager {
      */
     fun mail(container: Container)
 
+    /**
+     * Thread safe; submit a command for running
+     */
     fun submit(command: Command)
 
     fun stopConnection()
 
     fun restartConnection()
+
+    fun stopAll()
 }

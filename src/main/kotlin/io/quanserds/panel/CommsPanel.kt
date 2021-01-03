@@ -1,11 +1,13 @@
 package io.quanserds.panel
 
 import io.quanserds.ConnectionState
+import io.quanserds.ConnectionState.*
 import io.quanserds.ControlPanel
 import io.quanserds.DSManager
 import io.quanserds.comm.api.Container
 import io.quanserds.fx.*
 import io.quanserds.icon.fontIcon
+import javafx.application.Platform
 import javafx.geometry.Insets
 import javafx.geometry.Pos
 import javafx.scene.control.Button
@@ -36,8 +38,53 @@ class CommsPanel : ControlPanel {
     override fun periodicResponseData(containers: List<Container>) {
     }
 
+    private val serverBox = textField {
+        text = "localhost:18001"
+        isEditable = false
+        width(120.0)
+    }
+
+    private val clientBox = textField {
+        text = "None"
+        isEditable = false
+        width(120.0)
+    }
+
+    private val commState = Label("No Simulator Communication").apply {
+        isWrapText = true
+        textAlignment = TextAlignment.CENTER
+        style = "-fx-font-size: 20; -fx-font-weight:bold"
+    }
+
+    private val commBoxes = (0 until 5).map { commBox() }
+
+    private val disconnectBtn = Button("", fontIcon(MaterialDesignS.STOP, 20)).apply {
+        setOnAction {
+            dsManager.stopConnection()
+        }
+    }
+
+    private val reconnectBtn = Button("", fontIcon(MaterialDesignR.RELOAD, 20)).apply {
+        setOnAction {
+            dsManager.restartConnection()
+        }
+    }
+
     override fun onConnectionStatus(state: ConnectionState, pings: BooleanArray, client: String) {
-        println("$state, ${pings.contentToString()}, client=$client")
+        Platform.runLater {
+            clientBox.text = client
+            commState.text = when (state) {
+                AwaitingConnection -> "Waiting to Connect"
+                Connected -> "Connected"
+                Disconnected -> "Disconnected"
+            }
+            for (i in 0 until 5) {
+                commBoxes[i].style = when (pings[i]) {
+                    true -> "-fx-background-color:#0f0"
+                    false -> "-fx-background-color:red"
+                }
+            }
+        }
     }
 
     private val panel = vbox {
@@ -63,9 +110,7 @@ class CommsPanel : ControlPanel {
                     style = "-fx-font-weight: bold"
                     prefWidth = 65.0
                 })
-                repeat(5) {
-                    add(commBox())
-                }
+                commBoxes.forEach { cb -> add(cb) }
             })
             add(hbox {
                 spacing = 8.0
@@ -74,11 +119,7 @@ class CommsPanel : ControlPanel {
                     style = "-fx-font-weight: bold"
                     prefWidth = 65.0
                 })
-                add(textField {
-                    text = "localhost:18001"
-                    isEditable = false
-                    width(120.0)
-                })
+                add(serverBox)
             })
 
             add(hbox {
@@ -88,11 +129,7 @@ class CommsPanel : ControlPanel {
                     style = "-fx-font-weight: bold"
                     prefWidth = 65.0
                 })
-                add(textField {
-                    text = "192.168.0.1:63345"
-                    isEditable = false
-                    width(120.0)
-                })
+                add(clientBox)
             })
 
             vspace()
@@ -100,8 +137,8 @@ class CommsPanel : ControlPanel {
                 spacing = 8.0
                 padding = Insets(0.0, 4.0, 0.0, 4.0)
                 align(Pos.CENTER_RIGHT)
-                add(Button("", fontIcon(MaterialDesignS.STOP, 20)))
-                add(Button("", fontIcon(MaterialDesignR.RELOAD, 20)))
+                add(disconnectBtn)
+                add(reconnectBtn)
             })
         })
         add(vbox {
@@ -109,11 +146,7 @@ class CommsPanel : ControlPanel {
             prefHeight = 70.0
             padding = Insets(0.0, 8.0, 0.0, 8.0)
             align(Pos.CENTER)
-            add(Label("No Simulator Communication").apply {
-                isWrapText = true
-                textAlignment = TextAlignment.CENTER
-                style = "-fx-font-size: 20; -fx-font-weight:bold"
-            })
+            add(commState)
         })
     }
 
