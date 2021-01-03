@@ -2,7 +2,6 @@ package io.quanserds
 
 import io.quanserds.fx.*
 import io.quanserds.icon.fontIcon
-import io.quanserds.panel.*
 import javafx.geometry.Insets
 import javafx.geometry.Pos
 import javafx.scene.Scene
@@ -19,17 +18,13 @@ import javafx.stage.StageStyle
 import org.kordamp.ikonli.Ikon
 import org.kordamp.ikonli.materialdesign2.MaterialDesignW
 
-class QDSWindow(private val stage: Stage) {
+class QDSWindow(private val stage: Stage, private val panels: List<ControlPanel>) {
 
+    private val scheduler = Scheduler()
 
-    private val panels = listOf(
-        CommsPanel(),
-        AutonPanel(),
-        QArmPanel(),
-        QBot2ePanel(),
-        TablePanel(),
-        AutoclavePanel()
-    )
+    init {
+        scheduler.acceptAll(panels)
+    }
 
     private val appIcon = Image(QuanserDS::class.java.getResourceAsStream("/icon.png"))
 
@@ -37,6 +32,7 @@ class QDSWindow(private val stage: Stage) {
         padding = Insets(8.0)
         spacing = 8.0
         style = "-fx-background-color: rgb(0, 68, 126)"
+
         add(hbox {
             spacing = 8.0
             padding = Insets(0.0, 4.0, 0.0, 4.0)

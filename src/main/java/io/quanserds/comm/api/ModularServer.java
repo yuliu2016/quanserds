@@ -23,17 +23,30 @@ public class ModularServer implements AutoCloseable {
 
     public ModularServer(int port) {
         serverStream = new Stream(port, readBuffer);
+    }
+
+    public void connect() {
+        serverStream.connect();
 
         System.out.println("Waiting for simulation to connect...");
 
         while (true) {
-            if (serverStream.poll(3)) {
+            if (serverStream.waitToAccept(3)) {
                 break;
             }
         }
 
         System.out.println("Connection accepted");
         System.out.println("Simulation connected");
+    }
+
+    public void disconnect() {
+        serverStream.disconnect(false);
+        System.out.println("Disconnected From Client");
+    }
+
+    public String getClientAddress() {
+        return serverStream.getClientAddress();
     }
 
     public void sendContainer(Container container) {
@@ -82,7 +95,8 @@ public class ModularServer implements AutoCloseable {
 
     /**
      * Check if new data is available.
-     * @return  true if a complete packet has been received.
+     *
+     * @return true if a complete packet has been received.
      */
     public boolean receiveNewData() {
         int bytesRead = serverStream.receive();
@@ -135,7 +149,7 @@ public class ModularServer implements AutoCloseable {
             bb.get(payload);
 
             var container = Container.
-                    of(containerSize, deviceID, deviceNumber,deviceFunction,payload);
+                    of(containerSize, deviceID, deviceNumber, deviceFunction, payload);
 
             containers.add(container);
             packetIndex += containerSize;
@@ -157,7 +171,7 @@ public class ModularServer implements AutoCloseable {
     }
 
     @Override
-    public void close() throws Exception {
+    public void close() {
         serverStream.close();
         System.out.println("Comm Server Closed");
     }

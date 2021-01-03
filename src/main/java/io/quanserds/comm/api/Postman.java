@@ -19,6 +19,7 @@ public class Postman implements AutoCloseable {
     public Postman(int port) {
         System.out.println("Initializing Comm Server");
         commServer = new ModularServer(port);
+        commServer.connect();
         System.out.println("Comm Server Initialized");
     }
 
@@ -131,7 +132,6 @@ public class Postman implements AutoCloseable {
 
     @Override
     public void close() throws Exception {
-        commServer.sendQueue();
         commServer.close();
     }
 }

@@ -14,10 +14,12 @@ public class Stream implements AutoCloseable {
 
     // https://www.baeldung.com/java-nio2-async-socket-channel
 
-    private AsynchronousServerSocketChannel serverChannel;
+    private final AsynchronousServerSocketChannel serverChannel;
+
     private Future<AsynchronousSocketChannel> acceptFuture;
 
     private AsynchronousSocketChannel clientChannel;
+
     private Future<Integer> readFuture = null;
 
     private final ByteBuffer readBuffer;
@@ -28,19 +30,70 @@ public class Stream implements AutoCloseable {
             serverChannel = AsynchronousServerSocketChannel.open();
             serverChannel.bind(new InetSocketAddress(localhost, port));
         } catch (IOException e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
 
-        acceptFuture = serverChannel.accept();
+        if (buffer == null) {
+            throw new IllegalArgumentException();
+        }
+
         readBuffer = ByteBuffer.wrap(buffer);
     }
 
-    public boolean poll(int timeoutSeconds) {
-        if (clientChannel != null) {
-            return false;
+    public void connect() {
+        if (!serverChannel.isOpen()) {
+            throw new IllegalStateException("Server Channel has already closed");
         }
+        if (clientChannel != null) {
+            throw new IllegalStateException("There is already a client; Disconnect First!");
+        }
+        if (acceptFuture != null) {
+            throw new IllegalStateException("Already trying to connect");
+        }
+        acceptFuture = serverChannel.accept();
+    }
+
+    public void disconnect(boolean stopServer) {
+        try {
+            if (clientChannel != null && clientChannel.isOpen()) {
+                clientChannel.close();
+                clientChannel = null;
+            }
+            if (stopServer) {
+                serverChannel.close();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public String getClientAddress() {
+        if (clientChannel == null || !clientChannel.isOpen()) {
+            throw new IllegalStateException("No client to get address from");
+        }
+        String addr = "N/A";
+        try {
+            SocketAddress sa = clientChannel.getRemoteAddress();
+            if (sa instanceof InetSocketAddress) {
+                var inet = (InetSocketAddress) sa;
+                addr = inet.getHostString() + ":" + inet.getPort();
+            }
+        } catch (IOException e) {
+            addr = "I/O Error";
+            e.printStackTrace();
+        }
+
+        return addr;
+    }
+
+    public boolean waitToAccept(int timeoutSeconds) {
+        if (clientChannel != null) {
+            throw new IllegalStateException("Cannot wait to accept when there's already a client");
+        }
+
         try {
             clientChannel = acceptFuture.get(timeoutSeconds, TimeUnit.SECONDS);
+
             boolean accepted = clientChannel != null && clientChannel.isOpen();
             if (accepted) {
                 // Get ready to read the first data when receive is called
@@ -48,63 +101,35 @@ public class Stream implements AutoCloseable {
             }
             return accepted;
         } catch (InterruptedException | ExecutionException | TimeoutException e) {
+            // Didn't get anything due to timeout, need to call this function again to try
             return false;
         }
     }
 
-    public void stop() {
-        try {
-            if (clientChannel != null && clientChannel.isOpen()) {
-                clientChannel.close();
-                clientChannel = null;
-            }
-            serverChannel.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    public void reconnect() {
-        if (clientChannel != null && clientChannel.isOpen()) {
-            try {
-                clientChannel.close();
-                clientChannel = null;
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-        acceptFuture = serverChannel.accept();
-    }
-
     public void send(ByteBuffer buffer) {
-        if (outboundDataListener == null) {
+        if (clientChannel == null) {
+            throw new IllegalStateException("No client present to send data to");
+        }
+
+        if (outboundCompletionHandler == null) {
             clientChannel.write(buffer);
         } else {
-            String s = CommUtil.bytesToHex(buffer.array());
-            clientChannel.write(buffer, s, new CompletionHandler<>() {
-                @Override
-                public void completed(Integer result, String attachment) {
-                    if (outboundDataListener != null && attachment != null) {
-                        outboundDataListener.accept(true, attachment);
-                    }
-                }
-
-                @Override
-                public void failed(Throwable exc, String attachment) {
-                    if (outboundDataListener != null && attachment != null) {
-                        outboundDataListener.accept(false, attachment);
-                    }
-                }
-            });
+            clientChannel.write(buffer, CommUtil.bytesToHex(buffer.array()),
+                    outboundCompletionHandler);
         }
     }
 
     public int receive() {
+        if (readFuture == null) {
+            throw new IllegalStateException("No data read future to receive from");
+        }
+
         if (readFuture.isDone()) {
             int bytesRead = 0;
             try {
                 bytesRead = readFuture.get();
             } catch (InterruptedException | ExecutionException ignored) {
+                // No bytes are read
             }
 
             readFuture = clientChannel.read(readBuffer);
@@ -116,13 +141,30 @@ public class Stream implements AutoCloseable {
     }
 
     @Override
-    public void close() throws Exception {
-        stop();
+    public void close() {
+        disconnect(true);
     }
 
-    private static BiConsumer<Boolean, String> outboundDataListener = null;
+    private static CompletionHandler<Integer, String> outboundCompletionHandler = null;
 
     public static void setOutboundDataListener(BiConsumer<Boolean, String> outboundDataListener) {
-        Stream.outboundDataListener = outboundDataListener;
+        if (outboundDataListener == null) {
+            throw new IllegalArgumentException();
+        }
+        outboundCompletionHandler = new CompletionHandler<>() {
+            @Override
+            public void completed(Integer result, String attachment) {
+                if (attachment != null) {
+                    outboundDataListener.accept(true, attachment);
+                }
+            }
+
+            @Override
+            public void failed(Throwable exc, String attachment) {
+                if (attachment != null) {
+                    outboundDataListener.accept(false, attachment);
+                }
+            }
+        };
     }
 }

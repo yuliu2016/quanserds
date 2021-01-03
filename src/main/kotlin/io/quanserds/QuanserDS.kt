@@ -1,5 +1,6 @@
 package io.quanserds
 
+import io.quanserds.panel.*
 import javafx.application.Application
 import javafx.scene.text.Font
 import javafx.stage.Stage
@@ -13,6 +14,13 @@ class QuanserDS : Application() {
                 .toExternalForm(), 20.0
         )
 
-        QDSWindow(primaryStage)
+        QDSWindow(primaryStage, listOf(
+            CommsPanel(),
+            AutonPanel(),
+            QArmPanel(),
+            QBot2ePanel(),
+            TablePanel(),
+            AutoclavePanel()
+        ))
     }
 }
