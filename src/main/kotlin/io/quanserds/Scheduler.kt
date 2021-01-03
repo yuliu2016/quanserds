@@ -5,6 +5,7 @@ import io.quanserds.comm.api.Container
 import io.quanserds.comm.api.ModularServer
 import io.quanserds.command.Command
 import java.util.*
+import kotlin.collections.ArrayDeque
 import kotlin.concurrent.schedule
 import kotlin.concurrent.scheduleAtFixedRate
 
@@ -24,9 +25,13 @@ class Scheduler(private val panels: List<ControlPanel>) : DSManager {
 
     private val commands = mutableListOf<Command>()
 
-    private val pings = MutableList(5) { CommLevel.NoConnection }
+    private val pings = ArrayDeque<CommLevel>(30)
 
     init {
+        for (i in 0 until 30) {
+            pings.addLast(CommLevel.NoConnection)
+        }
+
         panels.forEach { it.accept(this) }
 
         // Start by waiting for a connection
@@ -38,8 +43,8 @@ class Scheduler(private val panels: List<ControlPanel>) : DSManager {
     }
 
     private fun updatePingStatus(commLevel: CommLevel) {
-        pings.add(commLevel)
-        pings.removeAt(0)
+        pings.addLast(commLevel)
+        pings.removeFirst()
         panels.forEach {
             it.onConnectionStatus(state, pings, client)
         }

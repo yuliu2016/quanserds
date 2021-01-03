@@ -16,6 +16,7 @@ import javafx.scene.control.Button
 import javafx.scene.control.Label
 import javafx.scene.image.Image
 import javafx.scene.image.ImageView
+import javafx.scene.paint.Color
 import javafx.scene.text.TextAlignment
 import org.kordamp.ikonli.materialdesign2.MaterialDesignA
 import org.kordamp.ikonli.materialdesign2.MaterialDesignR
@@ -58,7 +59,16 @@ class CommsPanel : ControlPanel {
         style = "-fx-font-size: 20; -fx-font-weight:bold"
     }
 
-    private val commBoxes = (0 until 5).map { commBox() }
+    private val commCanvas = canvas {
+        width = 120.0
+        height = 12.0
+    }
+    private val gc = commCanvas.graphicsContext2D
+
+    init {
+        gc.fill = Color.BLACK
+        gc.fillRect(0.0, 0.0, 120.0, 12.0)
+    }
 
     private val disconnectBtn = Button("", fontIcon(MaterialDesignS.STOP, 20)).apply {
         setOnAction {
@@ -72,7 +82,7 @@ class CommsPanel : ControlPanel {
         }
     }
 
-    override fun onConnectionStatus(state: ConnectionState, pings: List<CommLevel>, client: String) {
+    override fun onConnectionStatus(state: ConnectionState, pings: ArrayDeque<CommLevel>, client: String) {
         Platform.runLater {
             clientBox.text = client
             commState.text = when (state) {
@@ -80,12 +90,14 @@ class CommsPanel : ControlPanel {
                 Connected -> "Connected"
                 Disconnected -> "Disconnected"
             }
-            for (i in 0 until 5) {
-                commBoxes[i].style = when (pings[i]) {
-                    Data -> "-fx-background-color:#0f0"
-                    NoData -> "-fx-background-color:#f80"
-                    NoConnection -> "-fx-background-color:#f00"
+            pings.forEachIndexed { index, level ->
+                gc.fill = when (level) {
+                    Data -> Color.valueOf("#0f0")
+                    NoData -> Color.ORANGE
+                    NoConnection -> Color.RED
                 }
+                val x = index * 4.0
+                gc.fillRect(x, 0.0, 4.0, 12.0)
             }
         }
     }
@@ -113,7 +125,7 @@ class CommsPanel : ControlPanel {
                     style = "-fx-font-weight: bold"
                     prefWidth = 65.0
                 })
-                commBoxes.forEach { cb -> add(cb) }
+                add(commCanvas)
             })
             add(hbox {
                 spacing = 8.0
@@ -151,12 +163,6 @@ class CommsPanel : ControlPanel {
             align(Pos.CENTER)
             add(commState)
         })
-    }
-
-    private fun commBox() = vbox {
-        prefWidth = 20.0
-        maxHeight = 10.0
-        style = "-fx-background-color:red"
     }
 
     override fun getNode() = panel
