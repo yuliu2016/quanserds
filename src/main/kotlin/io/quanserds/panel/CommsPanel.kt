@@ -1,5 +1,6 @@
 package io.quanserds.panel
 
+import io.quanserds.ConnectionState
 import io.quanserds.ControlPanel
 import io.quanserds.DSManager
 import io.quanserds.comm.api.Container
@@ -35,11 +36,11 @@ class CommsPanel : ControlPanel {
     override fun periodicResponseData(containers: List<Container>) {
     }
 
-    override fun onConnectionStatus(pings: BooleanArray, server: String, client: String) {
-
+    override fun onConnectionStatus(state: ConnectionState, pings: BooleanArray, client: String) {
+        println("$state, ${pings.contentToString()}, client=$client")
     }
 
-    val panel = vbox {
+    private val panel = vbox {
         maxWidth = 200.0
         spacing = 8.0
 

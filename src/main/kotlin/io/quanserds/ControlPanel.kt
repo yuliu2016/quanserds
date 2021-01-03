@@ -14,19 +14,36 @@ interface ControlPanel {
 
     fun getNode(): Node
 
-    // N.W. should always be called before getNode is called
+    /**
+     * should always be called before getNode is called
+     */
     fun accept(manager: DSManager)
 
     /**
      * Handle keystrokes
+     *
+     * Runs on the proper UI thread
      */
     fun onKeyPressed(e: KeyEvent) {
         // do nothing
     }
 
-    fun onConnectionStatus(pings: BooleanArray, server: String, client: String) {
+    /**
+     * When the connection status changes
+     *
+     * Important: Runs on the comms thread. Must use
+     * [javafx.application.Platform.runLater] to modify
+     * the UI
+     */
+    fun onConnectionStatus(state: ConnectionState, pings: BooleanArray, client: String) {
     }
 
+    /**
+     * Event handler for command submission
+     *
+     * Runs on the same thread as when [DSManager.submit] is called,
+     * typically the UI thread
+     */
     fun onCommandSubmitted(command: Command) {
     }
 
@@ -38,6 +55,10 @@ interface ControlPanel {
 
     /**
      * Filtered data according to mailFilter
+     *
+     * Important: Runs on the comms thread. Must use
+     * [javafx.application.Platform.runLater] to modify
+     * the UI
      */
     fun periodicResponseData(containers: List<Container>)
 }
