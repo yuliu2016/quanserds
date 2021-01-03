@@ -4,14 +4,18 @@ import io.quanserds.ControlPanel
 import io.quanserds.DSManager
 import io.quanserds.comm.api.CommAPI
 import io.quanserds.comm.api.Container
+import io.quanserds.comm.math.QArmMath
+import io.quanserds.command.instantCommand
 import io.quanserds.fx.*
 import io.quanserds.icon.fontIcon
+import javafx.application.Platform
 import javafx.geometry.Insets
 import javafx.geometry.Pos
 import javafx.scene.Node
 import javafx.scene.control.Button
 import javafx.scene.control.Tooltip
 import javafx.scene.layout.GridPane
+import javafx.util.StringConverter
 import org.kordamp.ikonli.materialdesign2.*
 
 class QArmPanel : ControlPanel {
@@ -21,16 +25,40 @@ class QArmPanel : ControlPanel {
 
     override val mailFilter = listOf(CommAPI.ID_QARM)
 
-    override fun periodicRequestData() {
-    }
-
     private lateinit var dsManager: DSManager
+
+    override fun periodicRequestData() {
+//        val dsm = dsManager
+//        dsm.postMail(CommAPI.qarm_CommandAndRequestState(0, 0f,0f,
+//            0f,0f,0f,0f,0f,0f,0f))
+    }
 
     override fun accept(manager: DSManager) {
         dsManager = manager
     }
 
     override fun periodicResponseData(containers: List<Container>) {
+    }
+
+    private var b = 0.0
+    private var s = 0.0
+    private var e = 0.0
+    private var w = 0.0
+    private var g = 0.0
+
+    val epx = textField {
+        width(80.0)
+        text = "0.4064"
+    }
+
+    val epy = textField {
+        width(80.0)
+        text = "0.0000"
+    }
+
+    val epz = textField {
+        width(80.0)
+        text = "0.4826"
     }
 
     private val panel = vbox {
@@ -41,11 +69,26 @@ class QArmPanel : ControlPanel {
         add(gridPane {
             hgap = 8.0
             vgap = 4.0
-            makeSlider(0, "Base")
-            makeSlider(1, "Shoulder")
-            makeSlider(2, "Elbow")
-            makeSlider(3, "Wrist")
-            makeSlider(4, "Gripper")
+            makeSlider(0, "Base", -175, 175) {
+                b = it * Math.PI / 180.0
+                dsManager.postMail(CommAPI.qarm_CommandBase(0, b.toFloat()))
+            }
+            makeSlider(1, "Shoulder", -90, 90) {
+                s = it * Math.PI / 180.0
+                dsManager.postMail(CommAPI.qarm_CommandShoulder(0, s.toFloat()))
+            }
+            makeSlider(2, "Elbow", -80, 80) {
+                e = it * Math.PI / 180.0
+                dsManager.postMail(CommAPI.qarm_CommandElbow(0, e.toFloat()))
+            }
+            makeSlider(3, "Wrist", -170, 170) {
+                w = it * Math.PI / 180.0
+                dsManager.postMail(CommAPI.qarm_CommandWrist(0, w.toFloat()))
+            }
+            makeSlider(4, "Gripper", -55, 55) {
+                g = it * Math.PI / 180.0
+                dsManager.postMail(CommAPI.qarm_CommandGripper(0, g.toFloat()))
+            }
         })
         add(gridPane {
             hgap = 8.0
@@ -53,30 +96,20 @@ class QArmPanel : ControlPanel {
             add(gridLabel("x"), 0, 0)
             add(gridLabel("y"), 1, 0)
             add(gridLabel("z"), 2, 0)
-            add(textField {
-                width(80.0)
-                text = "0.4064"
-            }, 0, 1)
-            add(textField {
-                width(80.0)
-                text = "0.0000"
-            }, 1, 1)
-            add(textField {
-                width(80.0)
-                text = "0.4826"
-            }, 2, 1)
+            add(epx, 0, 1)
+            add(epy, 1, 1)
+            add(epz, 2, 1)
         })
-
 
         vspace()
 
         add(gridPane {
             hgap = 10.0
             vgap = 4.0
-            add(fingerPad(0), 0, 0)
-            add(fingerPad(0), 1, 0)
-            add(fingerPad(0), 2, 0)
-            add(fingerPad(0), 3, 0)
+            add(fingerPad(), 0, 0)
+            add(fingerPad(), 1, 0)
+            add(fingerPad(), 2, 0)
+            add(fingerPad(), 3, 0)
         })
 
         add(textField {
@@ -105,30 +138,65 @@ class QArmPanel : ControlPanel {
         })
     }
 
-    private fun fingerPad(rotate: Int): Node {
+    private fun fingerPad(): Node {
         return hbox {
             height(4.0)
             width(56.0)
-            style = "-fx-background-color: orange; -fx-rotate: $rotate;"
+            style = "-fx-background-color: orange;"
         }
     }
 
-    private fun GridPane.makeSlider(index: Int, text: String) {
+    private fun GridPane.makeSlider(index: Int, text: String, min: Int, max: Int, onChange: (Int) -> Unit) {
         val tooltip = Tooltip("Control the $text of the QArm between (-20°, 20°)")
+
+        val s = slider {
+            this.value = 0.0
+            this.min = min.toDouble()
+            this.max = max.toDouble()
+            this.blockIncrement = 5.0
+            width(120.0)
+            this.tooltip = tooltip
+        }
+
+        val t = textField {
+            this.text = "0"
+            width(60.0)
+            this.tooltip = tooltip
+        }
+
+        t.textProperty().bindBidirectional(s.valueProperty(), object : StringConverter<Number>() {
+            override fun toString(ob: Number?): String {
+                return ob?.toInt().toString() + "°"
+            }
+
+            override fun fromString(string: String?): Number {
+                val i = string?.trim('°')?.toIntOrNull() ?: 0
+                return i.coerceIn(min, max)
+            }
+        })
+
         add(label {
             this.text = text
             this.tooltip = tooltip
         }, 0, index)
-        add(slider {
-            this.value = 50.0
-            width(120.0)
-            this.tooltip = tooltip
-        }, 1, index)
-        add(textField {
-            this.text = "0"
-            width(60.0)
-            this.tooltip = tooltip
-        }, 2, index)
+        add(s, 1, index)
+        add(t, 2, index)
+
+        s.valueProperty().addListener { observable, oldValue, newValue ->
+            dsManager.submit(instantCommand("A", "B", "C$newValue") {
+                onChange(newValue.toInt())
+                Platform.runLater {
+                    updateEndEffectors()
+                }
+            })
+        }
+    }
+
+    private fun updateEndEffectors() {
+        val res = QArmMath.forwardKinematics(b, s, e, w)
+        epx.text = res[0].f
+        epy.text = res[1].f
+        epz.text = res[2].f
     }
 
     override fun getNode() = panel

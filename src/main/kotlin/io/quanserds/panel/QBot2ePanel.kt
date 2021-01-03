@@ -41,7 +41,7 @@ class QBot2ePanel : ControlPanel {
 
     override fun periodicRequestData() {
         val ds = dsManager
-        ds.postMail(qbot2e_CommandAndRequestState(kD, 0.05f, (Math.random() - 0.5).toFloat() * 2))
+        ds.postMail(qbot2e_CommandAndRequestState(kD, 0f, 0f))
     }
 
     override fun onKeyPressed(e: KeyEvent) {
