@@ -4,20 +4,28 @@ import io.quanserds.ConnectionState.*
 import io.quanserds.comm.api.Container
 import io.quanserds.comm.api.ModularServer
 import io.quanserds.command.Command
-import java.util.*
+import javafx.animation.AnimationTimer
 import kotlin.collections.ArrayDeque
-import kotlin.concurrent.schedule
-import kotlin.concurrent.scheduleAtFixedRate
 
 class Scheduler(private val panels: List<ControlPanel>) : DSManager {
 
     companion object {
         const val kPort = 18001
-        const val kUpdateRate = 500L // millis
+        const val kUpdateRate = 0.5e9.toLong() // nano
     }
 
     private val commServer = ModularServer(kPort)
-    private val timer = Timer("QDS Comms Scheduler", true)
+
+    private val timer2 = object : AnimationTimer() {
+        var previousTime = 0L
+        override fun handle(now: Long) {
+            val delta = now - previousTime
+            if (delta > kUpdateRate) {
+                periodicUpdate()
+                previousTime = now
+            }
+        }
+    }
     private val inboxFilters = panels.associateBy { it.mailFilter }
 
     private var state = AwaitingConnection
@@ -39,7 +47,7 @@ class Scheduler(private val panels: List<ControlPanel>) : DSManager {
         state = AwaitingConnection
 
         // Start a periodic timer
-        timer.scheduleAtFixedRate(0L, kUpdateRate) { periodicUpdate() }
+        timer2.start()
     }
 
     private fun updatePingStatus(commLevel: CommLevel) {
@@ -110,31 +118,21 @@ class Scheduler(private val panels: List<ControlPanel>) : DSManager {
     }
 
     override fun postMail(container: Container) {
-        // must run on the scheduler thread
         commServer.queueContainer(container)
     }
 
     override fun submit(command: Command) {
-        timer.schedule(0L) {
-            panels.forEach { it.onCommandSubmitted(command) }
-            command.start()
-            commands.add(command)
-        }
+        panels.forEach { it.onCommandSubmitted(command) }
+        command.start()
+        commands.add(command)
     }
 
     override fun stopConnection() {
-        // context-switch to comms thread with delay 0
-        timer.schedule(0L) {
-            disconnectAll()
-            updatePingStatus(CommLevel.NoConnection)
-        }
-    }
-
-    private fun disconnectAll() {
         commands.clear()
         client = "None"
         commServer.disconnect()
         state = Disconnected
+        updatePingStatus(CommLevel.NoConnection)
 
         // Try to get rid of some memory...
         Runtime.getRuntime().gc()
@@ -149,10 +147,7 @@ class Scheduler(private val panels: List<ControlPanel>) : DSManager {
             // incorrect state
             return
         }
-        // context-switch to comms thread with delay 0
-        timer.schedule(0L) {
-            commServer.connect(false)
-            state = AwaitingConnection
-        }
+        commServer.connect(false)
+        state = AwaitingConnection
     }
 }

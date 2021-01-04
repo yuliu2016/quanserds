@@ -21,8 +21,6 @@ interface ControlPanel {
 
     /**
      * Handle keystrokes
-     *
-     * Runs on the proper UI thread
      */
     fun onKeyPressed(e: KeyEvent) {
         // do nothing
@@ -30,19 +28,12 @@ interface ControlPanel {
 
     /**
      * When the connection status changes
-     *
-     * Important: Runs on the comms thread. Must use
-     * [javafx.application.Platform.runLater] to modify
-     * the UI
      */
     fun onConnectionStatus(state: ConnectionState, pings: ArrayDeque<CommLevel>, client: String) {
     }
 
     /**
      * Event handler for command submission
-     *
-     * Runs on the same thread as when [DSManager.submit] is called,
-     * typically the UI thread
      */
     fun onCommandSubmitted(command: Command) {
     }
@@ -55,10 +46,6 @@ interface ControlPanel {
 
     /**
      * Filtered data according to mailFilter
-     *
-     * Important: Runs on the comms thread. Must use
-     * [javafx.application.Platform.runLater] to modify
-     * the UI
      */
     fun periodicResponseData(containers: List<Container>)
 }
