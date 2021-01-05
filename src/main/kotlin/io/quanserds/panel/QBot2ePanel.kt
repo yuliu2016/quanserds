@@ -7,7 +7,6 @@ import io.quanserds.comm.api.Container
 import io.quanserds.comm.struct.QBot2eState
 import io.quanserds.fx.*
 import io.quanserds.icon.fontIcon
-import javafx.application.Platform
 import javafx.geometry.Insets
 import javafx.geometry.Pos
 import javafx.scene.canvas.GraphicsContext
@@ -22,16 +21,10 @@ import org.kordamp.ikonli.materialdesign2.*
 
 class QBot2ePanel : ControlPanel {
 
-    companion object {
-        const val kD = 0
-    }
-
-
     override val name = "QBot2e"
     override val icon = MaterialDesignR.ROBOT_VACUUM
 
     override val mailFilter = listOf(ID_QBOT, ID_QBOT_BOX)
-
 
     private lateinit var dsManager: DSManager
 
@@ -41,7 +34,7 @@ class QBot2ePanel : ControlPanel {
 
     override fun periodicRequestData() {
         val ds = dsManager
-        ds.postMail(qbot2e_CommandAndRequestState(kD, 0f, 0f))
+        ds.postMail(qbot2e_CommandAndRequestState(0, 0f, 0.2f))
     }
 
     override fun onKeyPressed(e: KeyEvent) {
@@ -56,9 +49,8 @@ class QBot2ePanel : ControlPanel {
         when (deviceFunction) {
             FCN_QBOT_RESPONSE_STATE -> {
                 val state = qbot2e_ResponseState(this)
-                Platform.runLater {
-                    updateQBotState(state)
-                }
+                updateQBotState(state)
+                updateRobotDrawing(state)
             }
         }
     }
@@ -66,12 +58,26 @@ class QBot2ePanel : ControlPanel {
     private val cv = canvas {
         this.height = 60.0
         this.width = 60.0
-        graphicsContext2D.drawRobot(45.0)
+        graphicsContext2D.drawRobot(45.0, bL = false, bF = false, bR = false)
         this.translateX = 8.0
         this.translateY = 8.0
     }
 
-    private fun GraphicsContext.drawRobot(heading: Double) {
+    private fun updateRobotDrawing(s: QBot2eState) {
+        cv.graphicsContext2D.drawRobot(
+            s.heading.toDouble() * -1 * 180 / Math.PI,
+            s.bumper_left > 0, s.bumper_front > 0, s.bumper_right > 0
+        )
+    }
+
+    private fun GraphicsContext.drawRobot(
+        heading: Double,
+        bL: Boolean,
+        bF: Boolean,
+        bR: Boolean
+    ) {
+        clearRect(0.0, 0.0, 60.0, 60.0)
+
         val startAngle = heading - 90.0
         this.stroke = Color.ORANGE
         lineWidth = 2.0
@@ -80,10 +86,24 @@ class QBot2ePanel : ControlPanel {
 
         lineWidth = 6.0
         lineCap = StrokeLineCap.BUTT
-        stroke = Color.valueOf("#0f0")
-        this.strokeArc(4.0, 4.0, 52.0, 52.0, startAngle % 360, 55.0, ArcType.OPEN)
-        this.strokeArc(4.0, 4.0, 52.0, 52.0, (startAngle + 65.0) % 360, 50.0, ArcType.OPEN)
-        this.strokeArc(4.0, 4.0, 52.0, 52.0, (startAngle + 125.0) % 360, 55.0, ArcType.OPEN)
+
+        stroke = if (bR) Color.RED else Color.LIME
+        this.strokeArc(
+            4.0, 4.0, 52.0, 52.0,
+            startAngle % 360, 55.0, ArcType.OPEN
+        )
+
+        stroke = if (bF) Color.RED else Color.LIME
+        this.strokeArc(
+            4.0, 4.0, 52.0, 52.0,
+            (startAngle + 65.0) % 360, 50.0, ArcType.OPEN
+        )
+
+        stroke = if (bL) Color.RED else Color.LIME
+        this.strokeArc(
+            4.0, 4.0, 52.0, 52.0,
+            (startAngle + 125.0) % 360, 55.0, ArcType.OPEN
+        )
     }
 
     private val wx = tf()
