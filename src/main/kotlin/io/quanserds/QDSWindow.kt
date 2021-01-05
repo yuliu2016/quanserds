@@ -90,18 +90,22 @@ class QDSWindow(private val stage: Stage, private val panels: List<ControlPanel>
             Splash.gc(stage)
         }
         setOnKeyPressed {
-            it?.let { e ->
-                for (panel in panels) {
-                    panel.onKeyPressed(e)
-                }
+            for (panel in panels) {
+                panel.onKeyPressed(it)
             }
         }
+        setOnKeyReleased {
+            for (panel in panels) {
+                panel.onKeyReleased(it)
+            }
+        }
+
         stylesheets.addAll("/quanserds.css")
     }
 
 
     init {
-        val bounds = Screen.getPrimary().visualBounds;
+        val bounds = Screen.getPrimary().visualBounds
         val h = 348.0
         stage.title = "Quanser Driver Station"
         stage.x = 0.0

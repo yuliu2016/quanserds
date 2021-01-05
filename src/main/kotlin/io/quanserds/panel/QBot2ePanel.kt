@@ -13,10 +13,12 @@ import javafx.scene.canvas.GraphicsContext
 import javafx.scene.control.Button
 import javafx.scene.control.Label
 import javafx.scene.control.Tooltip
+import javafx.scene.input.KeyCode
 import javafx.scene.input.KeyEvent
 import javafx.scene.paint.Color
 import javafx.scene.shape.ArcType
 import javafx.scene.shape.StrokeLineCap
+import org.kordamp.ikonli.Ikon
 import org.kordamp.ikonli.materialdesign2.*
 
 class QBot2ePanel : ControlPanel {
@@ -28,17 +30,62 @@ class QBot2ePanel : ControlPanel {
 
     private lateinit var dsManager: DSManager
 
+    private var speed = 0.0
+    private var turn = 0.0
+
+    private var keyW = false
+    private var keyS = false
+    private var keyA = false
+    private var keyD = false
+    private var keyShift = false
+
     override fun accept(manager: DSManager) {
         dsManager = manager
     }
 
     override fun periodicRequestData() {
         val ds = dsManager
-        ds.postMail(qbot2e_CommandAndRequestState(0, 0f, 0.2f))
+        var fSpeed = 0f
+        var fTurn = 0f
+        if (keyW || keyS || keyA || keyD) {
+            if (keyW) fSpeed += 0.25f
+            if (keyS) fSpeed -= 0.25f
+            if (keyA) fTurn += 1f
+            if (keyD) fTurn -= 1f
+        } else {
+            fSpeed = speed.toFloat()
+            fTurn = turn.toFloat()
+        }
+        if (keyShift) {
+            fSpeed *= 2
+            fTurn *= 8
+        }
+        ds.postMail(qbot2e_CommandAndRequestState(0, fSpeed, fTurn))
     }
 
     override fun onKeyPressed(e: KeyEvent) {
-        // do nothing
+        if (e.isControlDown) return
+        when (e.code) {
+            KeyCode.W -> keyW = true
+            KeyCode.S -> keyS = true
+            KeyCode.A -> keyA = true
+            KeyCode.D -> keyD = true
+            KeyCode.SHIFT -> keyShift = true
+            else -> {
+            }
+        }
+    }
+
+    override fun onKeyReleased(e: KeyEvent) {
+        when (e.code) {
+            KeyCode.W -> keyW = false
+            KeyCode.S -> keyS = false
+            KeyCode.A -> keyA = false
+            KeyCode.D -> keyD = false
+            KeyCode.SHIFT -> keyShift = false
+            else -> {
+            }
+        }
     }
 
     override fun periodicResponseData(containers: List<Container>) {
@@ -66,7 +113,7 @@ class QBot2ePanel : ControlPanel {
     private fun updateRobotDrawing(s: QBot2eState) {
         cv.graphicsContext2D.drawRobot(
             s.heading.toDouble() * -1 * 180 / Math.PI,
-            s.bumper_left > 0, s.bumper_front > 0, s.bumper_right > 0
+            s.bumper_left != 0, s.bumper_front != 0, s.bumper_right != 0
         )
     }
 
@@ -144,35 +191,39 @@ class QBot2ePanel : ControlPanel {
         gy.text = s.gyro.f
     }
 
+    private fun makeLetterLabel(t: String, ic: Ikon) = Label(t, fontIcon(ic, 20)).apply {
+        style = "-fx-text-fill: #0f0"
+        width(38.0)
+    }
+
     private val mainPanel = vbox {
         spacing = 8.0
 
         add(gridPane {
             hgap = 8.0
             vgap = 4.0
-            add(Label("W", fontIcon(MaterialDesignA.ARROW_UP, 20)).apply {
-                style = "-fx-text-fill: #0f0"
-                width(38.0)
-            }, 0, 0)
-            add(slider { width(120.0); value = 50.0 }, 1, 0)
-            add(Label("S", fontIcon(MaterialDesignA.ARROW_DOWN, 20)).apply {
-                style = "-fx-text-fill: #0f0"
-                width(38.0)
-            }, 2, 0)
+
+            add(makeLetterLabel("W", MaterialDesignA.ARROW_UP), 0, 0)
+            add(slider {
+                width(120.0)
+                min = -1.0
+                max = 1.0
+                value = 0.0
+            }, 1, 0)
+            add(makeLetterLabel("S", MaterialDesignA.ARROW_DOWN), 2, 0)
             add(textField {
                 text = "0"
                 width(60.0)
             }, 3, 0)
 
-            add(Label("A", fontIcon(MaterialDesignR.ROTATE_LEFT, 20)).apply {
-                style = "-fx-text-fill: #0f0"
-                width(38.0)
-            }, 0, 1)
-            add(slider { width(120.0); value = 50.0 }, 1, 1)
-            add(Label("D", fontIcon(MaterialDesignR.ROTATE_RIGHT, 20)).apply {
-                style = "-fx-text-fill: #0f0"
-                width(38.0)
-            }, 2, 1)
+            add(makeLetterLabel("A", MaterialDesignR.ROTATE_LEFT), 0, 1)
+            add(slider {
+                width(120.0)
+                min = -1.0
+                max = 1.0
+                value = 0.0
+            }, 1, 1)
+            add(makeLetterLabel("D", MaterialDesignR.ROTATE_RIGHT), 2, 1)
             add(textField {
                 text = "0"
                 width(60.0)
@@ -252,9 +303,6 @@ class QBot2ePanel : ControlPanel {
             hspace()
             add(Button("", fontIcon(MaterialDesignS.STOP, 20)).apply {
                 tooltip = Tooltip("Move to Home")
-            })
-            add(Button("", fontIcon(MaterialDesignC.CALCULATOR, 20)).apply {
-                tooltip = Tooltip("QBot2e Math Calculator")
             })
             add(Button("", fontIcon(MaterialDesignI.INFORMATION_OUTLINE, 20)).apply {
                 tooltip = Tooltip("QBot2e Info")

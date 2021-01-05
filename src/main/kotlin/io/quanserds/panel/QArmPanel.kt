@@ -144,9 +144,6 @@ class QArmPanel : ControlPanel {
             add(Button("", fontIcon(MaterialDesignP.PALETTE_OUTLINE, 20)).apply {
                 tooltip = Tooltip("Change Base Colour")
             })
-            add(Button("", fontIcon(MaterialDesignC.CALCULATOR, 20)).apply {
-                tooltip = Tooltip("QArm Math Calculator")
-            })
             add(Button("", fontIcon(MaterialDesignI.INFORMATION_OUTLINE, 20)).apply {
                 tooltip = Tooltip("QArm Info")
             })

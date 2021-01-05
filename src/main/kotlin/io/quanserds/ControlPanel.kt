@@ -26,6 +26,10 @@ interface ControlPanel {
         // do nothing
     }
 
+    fun onKeyReleased(e: KeyEvent) {
+        // do nothing
+    }
+
     /**
      * When the connection status changes
      */
