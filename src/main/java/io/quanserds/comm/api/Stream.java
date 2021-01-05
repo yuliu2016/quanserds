@@ -169,7 +169,9 @@ public class Stream implements AutoCloseable {
             readFuture = null;
 
             // Copy over the data; make sure nothing is reading right now
-            System.arraycopy(inputArray, 0, outputArray, 0, bytesRead);
+            if (bytesRead > 0) {
+                System.arraycopy(inputArray, 0, outputArray, 0, bytesRead);
+            }
 
             prepareNextRead();
 

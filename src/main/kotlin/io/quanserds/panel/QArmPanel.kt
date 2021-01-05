@@ -8,7 +8,6 @@ import io.quanserds.comm.math.QArmMath
 import io.quanserds.command.instantCommand
 import io.quanserds.fx.*
 import io.quanserds.icon.fontIcon
-import javafx.application.Platform
 import javafx.geometry.Insets
 import javafx.geometry.Pos
 import javafx.scene.Node
@@ -28,9 +27,24 @@ class QArmPanel : ControlPanel {
     private lateinit var dsManager: DSManager
 
     override fun periodicRequestData() {
-//        val dsm = dsManager
-//        dsm.postMail(CommAPI.qarm_CommandAndRequestState(0, 0f,0f,
-//            0f,0f,0f,0f,0f,0f,0f))
+        val m = dsManager
+        if (commandOnNextPeriod) {
+            m.postMail(
+                CommAPI.qarm_CommandAndRequestState(
+                    0,
+                    b.toFloat(),
+                    s.toFloat(),
+                    e.toFloat(),
+                    w.toFloat(),
+                    g.toFloat(),
+                    0f,
+                    0f,
+                    1f,
+                    1f
+                )
+            )
+            commandOnNextPeriod = false
+        }
     }
 
     override fun accept(manager: DSManager) {
@@ -45,18 +59,19 @@ class QArmPanel : ControlPanel {
     private var e = 0.0
     private var w = 0.0
     private var g = 0.0
+    private var commandOnNextPeriod = false
 
-    val epx = textField {
+    private val epx = textField {
         width(80.0)
         text = "0.4064"
     }
 
-    val epy = textField {
+    private val epy = textField {
         width(80.0)
         text = "0.0000"
     }
 
-    val epz = textField {
+    private val epz = textField {
         width(80.0)
         text = "0.4826"
     }
@@ -71,23 +86,23 @@ class QArmPanel : ControlPanel {
             vgap = 4.0
             makeSlider(0, "Base", -175, 175) {
                 b = it * Math.PI / 180.0
-                dsManager.postMail(CommAPI.qarm_CommandBase(0, b.toFloat()))
+                commandOnNextPeriod = true
             }
             makeSlider(1, "Shoulder", -90, 90) {
                 s = it * Math.PI / 180.0
-                dsManager.postMail(CommAPI.qarm_CommandShoulder(0, s.toFloat()))
+                commandOnNextPeriod = true
             }
             makeSlider(2, "Elbow", -80, 80) {
                 e = it * Math.PI / 180.0
-                dsManager.postMail(CommAPI.qarm_CommandElbow(0, e.toFloat()))
+                commandOnNextPeriod = true
             }
             makeSlider(3, "Wrist", -170, 170) {
                 w = it * Math.PI / 180.0
-                dsManager.postMail(CommAPI.qarm_CommandWrist(0, w.toFloat()))
+                commandOnNextPeriod = true
             }
             makeSlider(4, "Gripper", -55, 55) {
                 g = it * Math.PI / 180.0
-                dsManager.postMail(CommAPI.qarm_CommandGripper(0, g.toFloat()))
+                commandOnNextPeriod = true
             }
         })
         add(gridPane {
@@ -182,12 +197,10 @@ class QArmPanel : ControlPanel {
         add(s, 1, index)
         add(t, 2, index)
 
-        s.valueProperty().addListener { observable, oldValue, newValue ->
+        s.valueProperty().addListener { _, _, newValue ->
             dsManager.submit(instantCommand("A", "B", "C$newValue") {
                 onChange(newValue.toInt())
-                Platform.runLater {
-                    updateEndEffectors()
-                }
+                updateEndEffectors()
             })
         }
     }

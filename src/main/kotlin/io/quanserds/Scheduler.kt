@@ -90,7 +90,7 @@ class Scheduler(private val panels: List<ControlPanel>) : DSManager {
             updatePingStatus(CommLevel.NoData)
         }
 
-        // Step 2 - Add all requests for data
+        // Step 2 - Add all requests for data and commands
         panels.forEach {
             it.periodicRequestData()
         }
@@ -99,6 +99,7 @@ class Scheduler(private val panels: List<ControlPanel>) : DSManager {
         val finished = commands.filter { it.isFinished() }
         finished.forEach { it.stop() }
         commands.removeAll(finished)
+        commands.forEach { it.execute() }
 
         // Step 4 - Deliver
         commServer.sendQueue()
