@@ -11,7 +11,7 @@ class Scheduler(private val panels: List<ControlPanel>) : DSManager {
 
     companion object {
         const val kPort = 18001
-        const val kUpdateRate = 0.5e9.toLong() // nano
+        const val kUpdateRate = 0.05e9.toLong() // nano
     }
 
     private val commServer = ModularServer(kPort)

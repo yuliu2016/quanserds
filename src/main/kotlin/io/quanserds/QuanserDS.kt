@@ -16,7 +16,6 @@ class QuanserDS : Application() {
 
         QDSWindow(primaryStage, listOf(
             CommsPanel(),
-            AutonPanel(),
             QArmPanel(),
             QBot2ePanel(),
             TablePanel(),

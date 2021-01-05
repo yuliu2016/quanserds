@@ -100,7 +100,7 @@ class QArmPanel : ControlPanel {
                 w = it * Math.PI / 180.0
                 commandOnNextPeriod = true
             }
-            makeSlider(4, "Gripper", -55, 55) {
+            makeSlider(4, "Gripper", 0, 55) {
                 g = it * Math.PI / 180.0
                 commandOnNextPeriod = true
             }

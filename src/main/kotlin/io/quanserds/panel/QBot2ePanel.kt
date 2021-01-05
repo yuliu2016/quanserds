@@ -30,9 +30,6 @@ class QBot2ePanel : ControlPanel {
 
     private lateinit var dsManager: DSManager
 
-    private var speed = 0.0
-    private var turn = 0.0
-
     private var keyW = false
     private var keyS = false
     private var keyA = false
@@ -48,16 +45,15 @@ class QBot2ePanel : ControlPanel {
         var fSpeed = 0f
         var fTurn = 0f
         if (keyW || keyS || keyA || keyD) {
-            if (keyW) fSpeed += 0.25f
-            if (keyS) fSpeed -= 0.25f
+            if (keyW) fSpeed += 0.5f
+            if (keyS) fSpeed -= 0.5f
             if (keyA) fTurn += 1f
             if (keyD) fTurn -= 1f
-        } else {
-            fSpeed = speed.toFloat()
-            fTurn = turn.toFloat()
+            // easier version of arcade drive
+            if (fSpeed < 0) fTurn *= -1
         }
         if (keyShift) {
-            fSpeed *= 2
+            fSpeed *= 4
             fTurn *= 8
         }
         ds.postMail(qbot2e_CommandAndRequestState(0, fSpeed, fTurn))
@@ -106,8 +102,6 @@ class QBot2ePanel : ControlPanel {
         this.height = 60.0
         this.width = 60.0
         graphicsContext2D.drawRobot(45.0, bL = false, bF = false, bR = false)
-        this.translateX = 8.0
-        this.translateY = 8.0
     }
 
     private fun updateRobotDrawing(s: QBot2eState) {
@@ -204,30 +198,18 @@ class QBot2ePanel : ControlPanel {
             vgap = 4.0
 
             add(makeLetterLabel("W", MaterialDesignA.ARROW_UP), 0, 0)
-            add(slider {
-                width(120.0)
-                min = -1.0
-                max = 1.0
-                value = 0.0
-            }, 1, 0)
-            add(makeLetterLabel("S", MaterialDesignA.ARROW_DOWN), 2, 0)
+            add(makeLetterLabel("S", MaterialDesignA.ARROW_DOWN), 1, 0)
             add(textField {
                 text = "0"
                 width(60.0)
-            }, 3, 0)
+            }, 2, 0)
 
             add(makeLetterLabel("A", MaterialDesignR.ROTATE_LEFT), 0, 1)
-            add(slider {
-                width(120.0)
-                min = -1.0
-                max = 1.0
-                value = 0.0
-            }, 1, 1)
-            add(makeLetterLabel("D", MaterialDesignR.ROTATE_RIGHT), 2, 1)
+            add(makeLetterLabel("D", MaterialDesignR.ROTATE_RIGHT), 1, 1)
             add(textField {
                 text = "0"
                 width(60.0)
-            }, 3, 1)
+            }, 2, 1)
         })
 
         add(gridPane {
