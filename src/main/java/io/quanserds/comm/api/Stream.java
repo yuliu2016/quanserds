@@ -21,23 +21,30 @@ public class Stream implements AutoCloseable {
     private AsynchronousSocketChannel clientChannel;
 
     private Future<Integer> readFuture = null;
-
     private final ByteBuffer readBuffer;
+    private final byte[] inputArray;
+    private final byte[] outputArray;
 
-    public Stream(int port, byte[] buffer) {
+    private static AsynchronousServerSocketChannel open(int port) {
         try {
             var localhost = InetAddress.getByName("localhost");
-            serverChannel = AsynchronousServerSocketChannel.open();
-            serverChannel.bind(new InetSocketAddress(localhost, port));
+            var sc = AsynchronousServerSocketChannel.open();
+            sc.bind(new InetSocketAddress(localhost, port));
+            return sc;
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
 
-        if (buffer == null) {
+    public Stream(int port, byte[] outputReadBuffer) {
+        if (port < 1000 || outputReadBuffer == null || outputReadBuffer.length < 256) {
             throw new IllegalArgumentException();
         }
 
-        readBuffer = ByteBuffer.wrap(buffer);
+        serverChannel = open(port);
+        outputArray = outputReadBuffer;
+        inputArray = new byte[outputReadBuffer.length];
+        readBuffer = ByteBuffer.wrap(inputArray);
     }
 
     public void connect() {
@@ -118,8 +125,7 @@ public class Stream implements AutoCloseable {
 
             boolean accepted = clientChannel != null && clientChannel.isOpen();
             if (accepted) {
-                // Get ready to read the first data when receive is called
-                readFuture = clientChannel.read(readBuffer);
+                prepareNextRead();
             }
             return accepted;
         } catch (InterruptedException | ExecutionException | TimeoutException e) {
@@ -141,6 +147,12 @@ public class Stream implements AutoCloseable {
         }
     }
 
+    private void prepareNextRead() {
+        // Clear the buffer to prepare for reading
+        readBuffer.clear();
+        readFuture = clientChannel.read(readBuffer);
+    }
+
     public int receive() {
         if (readFuture == null) {
             throw new IllegalStateException("No data read future to receive from");
@@ -154,7 +166,13 @@ public class Stream implements AutoCloseable {
                 // No bytes are read
             }
 
-            readFuture = clientChannel.read(readBuffer);
+            readFuture = null;
+
+            // Copy over the data; make sure nothing is reading right now
+            System.arraycopy(inputArray, 0, outputArray, 0, bytesRead);
+
+            prepareNextRead();
+
             return bytesRead;
         } else {
             // It hasn't finished reading the buffer yet...
