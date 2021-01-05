@@ -10,9 +10,7 @@ import io.quanserds.icon.fontIcon
 import javafx.geometry.Insets
 import javafx.geometry.Pos
 import javafx.scene.canvas.GraphicsContext
-import javafx.scene.control.Button
-import javafx.scene.control.Label
-import javafx.scene.control.Tooltip
+import javafx.scene.control.*
 import javafx.scene.input.KeyCode
 import javafx.scene.input.KeyEvent
 import javafx.scene.paint.Color
@@ -197,19 +195,26 @@ class QBot2ePanel : ControlPanel {
             hgap = 8.0
             vgap = 4.0
 
-            add(makeLetterLabel("W", MaterialDesignA.ARROW_UP), 0, 0)
-            add(makeLetterLabel("S", MaterialDesignA.ARROW_DOWN), 1, 0)
-            add(textField {
-                text = "0"
-                width(60.0)
-            }, 2, 0)
+            val group = ToggleGroup()
 
-            add(makeLetterLabel("A", MaterialDesignR.ROTATE_LEFT), 0, 1)
-            add(makeLetterLabel("D", MaterialDesignR.ROTATE_RIGHT), 1, 1)
+            add(RadioButton("Fast").apply { toggleGroup = group; isSelected = true }, 0, 0)
+            add(RadioButton("Slow").apply { toggleGroup = group }, 0, 1)
+
+            add(makeLetterLabel("W", MaterialDesignA.ARROW_UP), 1, 0)
+            add(makeLetterLabel("S", MaterialDesignA.ARROW_DOWN), 2, 0)
+            add(label("Speed"), 3, 0)
             add(textField {
                 text = "0"
                 width(60.0)
-            }, 2, 1)
+            }, 4, 0)
+
+            add(makeLetterLabel("A", MaterialDesignR.ROTATE_LEFT), 1, 1)
+            add(makeLetterLabel("D", MaterialDesignR.ROTATE_RIGHT), 2, 1)
+            add(label("Turn"), 3, 1)
+            add(textField {
+                text = "0"
+                width(60.0)
+            }, 4, 1)
         })
 
         add(gridPane {

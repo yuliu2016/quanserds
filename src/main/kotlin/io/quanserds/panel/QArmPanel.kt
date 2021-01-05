@@ -28,23 +28,20 @@ class QArmPanel : ControlPanel {
 
     override fun periodicRequestData() {
         val m = dsManager
-        if (commandOnNextPeriod) {
-            m.postMail(
-                CommAPI.qarm_CommandAndRequestState(
-                    0,
-                    b.toFloat(),
-                    s.toFloat(),
-                    e.toFloat(),
-                    w.toFloat(),
-                    g.toFloat(),
-                    0f,
-                    0f,
-                    1f,
-                    1f
-                )
+        m.postMail(
+            CommAPI.qarm_CommandAndRequestState(
+                0,
+                b.toFloat(),
+                s.toFloat(),
+                e.toFloat(),
+                w.toFloat(),
+                g.toFloat(),
+                0f,
+                0f,
+                1f,
+                1f
             )
-            commandOnNextPeriod = false
-        }
+        )
     }
 
     override fun accept(manager: DSManager) {
@@ -59,7 +56,6 @@ class QArmPanel : ControlPanel {
     private var e = 0.0
     private var w = 0.0
     private var g = 0.0
-    private var commandOnNextPeriod = false
 
     private val epx = textField {
         width(80.0)
@@ -84,36 +80,31 @@ class QArmPanel : ControlPanel {
         add(gridPane {
             hgap = 8.0
             vgap = 4.0
-            makeSlider(0, "Base", -175, 175) {
-                b = it * Math.PI / 180.0
-                commandOnNextPeriod = true
-            }
-            makeSlider(1, "Shoulder", -90, 90) {
-                s = it * Math.PI / 180.0
-                commandOnNextPeriod = true
-            }
-            makeSlider(2, "Elbow", -80, 80) {
-                e = it * Math.PI / 180.0
-                commandOnNextPeriod = true
-            }
-            makeSlider(3, "Wrist", -170, 170) {
-                w = it * Math.PI / 180.0
-                commandOnNextPeriod = true
-            }
-            makeSlider(4, "Gripper", 0, 55) {
-                g = it * Math.PI / 180.0
-                commandOnNextPeriod = true
-            }
-        })
-        add(gridPane {
-            hgap = 8.0
-            vgap = 4.0
             add(gridLabel("x"), 0, 0)
             add(gridLabel("y"), 1, 0)
             add(gridLabel("z"), 2, 0)
             add(epx, 0, 1)
             add(epy, 1, 1)
             add(epz, 2, 1)
+        })
+        add(gridPane {
+            hgap = 8.0
+            vgap = 4.0
+            makeSlider(0, "Base", -175, 175) {
+                b = it * Math.PI / 180.0
+            }
+            makeSlider(1, "Shoulder", -90, 90) {
+                s = it * Math.PI / 180.0
+            }
+            makeSlider(2, "Elbow", -80, 80) {
+                e = it * Math.PI / 180.0
+            }
+            makeSlider(3, "Wrist", -170, 170) {
+                w = it * Math.PI / 180.0
+            }
+            makeSlider(4, "Gripper", 0, 55) {
+                g = it * Math.PI / 180.0
+            }
         })
 
         vspace()
