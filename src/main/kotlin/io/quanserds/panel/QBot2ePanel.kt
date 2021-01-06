@@ -184,7 +184,7 @@ class QBot2ePanel : ControlPanel {
     }
 
     private fun makeLetterLabel(t: String, ic: Ikon) = Label(t, fontIcon(ic, 20)).apply {
-        style = "-fx-text-fill: #0f0"
+        styleClass("keyboard-control-label")
         width(38.0)
     }
 
@@ -269,7 +269,6 @@ class QBot2ePanel : ControlPanel {
     private val megaPanel = vbox {
 
         styleClass("modular-panel")
-        maxWidth = 460.0
         spacing = 8.0
         padding = Insets(8.0)
 

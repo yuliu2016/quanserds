@@ -5,14 +5,16 @@ import io.quanserds.DSManager
 import io.quanserds.comm.api.CommAPI
 import io.quanserds.comm.api.Container
 import io.quanserds.comm.math.QArmMath
-import io.quanserds.command.instantCommand
 import io.quanserds.fx.*
 import io.quanserds.icon.fontIcon
 import javafx.geometry.Insets
 import javafx.geometry.Pos
 import javafx.scene.Node
 import javafx.scene.control.Button
+import javafx.scene.control.Slider
 import javafx.scene.control.Tooltip
+import javafx.scene.input.KeyCode
+import javafx.scene.input.KeyEvent
 import javafx.scene.layout.GridPane
 import javafx.util.StringConverter
 import org.kordamp.ikonli.materialdesign2.*
@@ -25,6 +27,12 @@ class QArmPanel : ControlPanel {
     override val mailFilter = listOf(CommAPI.ID_QARM)
 
     private lateinit var dsManager: DSManager
+
+    private var b = 0.0
+    private var s = 0.0
+    private var e = 0.0
+    private var w = 0.0
+    private var g = 0.0
 
     override fun periodicRequestData() {
         val m = dsManager
@@ -51,11 +59,6 @@ class QArmPanel : ControlPanel {
     override fun periodicResponseData(containers: List<Container>) {
     }
 
-    private var b = 0.0
-    private var s = 0.0
-    private var e = 0.0
-    private var w = 0.0
-    private var g = 0.0
 
     private val epx = textField {
         width(80.0)
@@ -72,9 +75,40 @@ class QArmPanel : ControlPanel {
         text = "0.4826"
     }
 
+    private fun makeSlider(min: Int, max: Int) = slider {
+        this.value = 0.0
+        this.min = min.toDouble()
+        this.max = max.toDouble()
+        this.blockIncrement = 5.0
+        width(120.0)
+        this.tooltip = tooltip
+    }
+
+    private val bSlider = makeSlider(-175, 175)
+    private val sSlider = makeSlider(-90, 90)
+    private val eSlider = makeSlider(-80, 80)
+    private val wSlider = makeSlider(-170, 170)
+    private val gSlider = makeSlider(-0, 55)
+
+    override fun onKeyPressed(e: KeyEvent) {
+        when (e.code) {
+            KeyCode.R -> bSlider.value -= 1
+            KeyCode.T -> bSlider.value += 1
+            KeyCode.F -> sSlider.value -= 1
+            KeyCode.G -> sSlider.value += 1
+            KeyCode.V -> eSlider.value -= 1
+            KeyCode.B -> eSlider.value += 1
+            KeyCode.Y -> wSlider.value -= 1
+            KeyCode.U -> wSlider.value += 1
+            KeyCode.H -> gSlider.value -= 1
+            KeyCode.J -> gSlider.value += 1
+            else -> {
+            }
+        }
+    }
+
     private val panel = vbox {
         styleClass("modular-panel")
-        maxWidth = 280.0
         spacing = 8.0
         padding = Insets(8.0)
         add(gridPane {
@@ -90,19 +124,19 @@ class QArmPanel : ControlPanel {
         add(gridPane {
             hgap = 8.0
             vgap = 4.0
-            makeSlider(0, "Base", -175, 175) {
+            makeSliderBar(0, "Base", bSlider, "R", "T") {
                 b = it * Math.PI / 180.0
             }
-            makeSlider(1, "Shoulder", -90, 90) {
+            makeSliderBar(1, "Shoulder", sSlider, "F", "G") {
                 s = it * Math.PI / 180.0
             }
-            makeSlider(2, "Elbow", -80, 80) {
+            makeSliderBar(2, "Elbow", eSlider, "V", "B") {
                 e = it * Math.PI / 180.0
             }
-            makeSlider(3, "Wrist", -170, 170) {
+            makeSliderBar(3, "Wrist", wSlider, "Y", "U") {
                 w = it * Math.PI / 180.0
             }
-            makeSlider(4, "Gripper", 0, 55) {
+            makeSliderBar(4, "Gripper", gSlider, "H", "J") {
                 g = it * Math.PI / 180.0
             }
         })
@@ -130,6 +164,13 @@ class QArmPanel : ControlPanel {
             padding = Insets(0.0, 4.0, 0.0, 4.0)
             spacing = 8.0
             add(Button("", fontIcon(MaterialDesignH.HOME, 20)).apply {
+                setOnAction {
+                    bSlider.value = 0.0
+                    sSlider.value = 0.0
+                    eSlider.value = 0.0
+                    wSlider.value = 0.0
+                    gSlider.value = 0.0
+                }
                 tooltip = Tooltip("Move to Home")
             })
             add(Button("", fontIcon(MaterialDesignP.PALETTE_OUTLINE, 20)).apply {
@@ -149,21 +190,19 @@ class QArmPanel : ControlPanel {
         }
     }
 
-    private fun GridPane.makeSlider(index: Int, text: String, min: Int, max: Int, onChange: (Int) -> Unit) {
-        val tooltip = Tooltip("Control the $text of the QArm between (-20°, 20°)")
-
-        val s = slider {
-            this.value = 0.0
-            this.min = min.toDouble()
-            this.max = max.toDouble()
-            this.blockIncrement = 5.0
-            width(120.0)
-            this.tooltip = tooltip
-        }
+    private fun GridPane.makeSliderBar(
+        index: Int,
+        kind: String,
+        s: Slider,
+        kL: String,
+        kR: String,
+        onChange: (Int) -> Unit
+    ) {
+        val tooltip = Tooltip("Control the $kind of the QArm between (-20°, 20°)")
 
         val t = textField {
             this.text = "0"
-            width(60.0)
+            width(36.0)
             this.tooltip = tooltip
         }
 
@@ -174,22 +213,26 @@ class QArmPanel : ControlPanel {
 
             override fun fromString(string: String?): Number {
                 val i = string?.trim('°')?.toIntOrNull() ?: 0
-                return i.coerceIn(min, max)
+                return i.coerceIn(s.min.toInt(), s.max.toInt())
             }
         })
 
         add(label {
-            this.text = text
+            this.text = kind
             this.tooltip = tooltip
         }, 0, index)
-        add(s, 1, index)
-        add(t, 2, index)
+        add(gridLabel(kL).apply {
+            styleClass("keyboard-control-label")
+        }, 1, index)
+        add(s, 2, index)
+        add(gridLabel(kR).apply {
+            styleClass("keyboard-control-label")
+        }, 3, index)
+        add(t, 4, index)
 
         s.valueProperty().addListener { _, _, newValue ->
-            dsManager.submit(instantCommand("A", "B", "C$newValue") {
-                onChange(newValue.toInt())
-                updateEndEffectors()
-            })
+            onChange(newValue.toInt())
+            updateEndEffectors()
         }
     }
 

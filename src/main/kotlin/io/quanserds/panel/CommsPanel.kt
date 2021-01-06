@@ -9,7 +9,6 @@ import io.quanserds.DSManager
 import io.quanserds.comm.api.Container
 import io.quanserds.fx.*
 import io.quanserds.icon.fontIcon
-import javafx.application.Platform
 import javafx.geometry.Insets
 import javafx.geometry.Pos
 import javafx.scene.control.Button
@@ -83,22 +82,20 @@ class CommsPanel : ControlPanel {
     }
 
     override fun onConnectionStatus(state: ConnectionState, pings: ArrayDeque<CommLevel>, client: String) {
-        Platform.runLater {
-            clientBox.text = client
-            commState.text = when (state) {
-                AwaitingConnection -> "Waiting to Connect"
-                Connected -> "Connected"
-                Disconnected -> "Disconnected"
+        clientBox.text = client
+        commState.text = when (state) {
+            AwaitingConnection -> "Waiting to Connect"
+            Connected -> "Connected"
+            Disconnected -> "Disconnected"
+        }
+        pings.forEachIndexed { index, level ->
+            gc.fill = when (level) {
+                Data -> Color.valueOf("#0f0")
+                NoData -> Color.ORANGE
+                NoConnection -> Color.RED
             }
-            pings.forEachIndexed { index, level ->
-                gc.fill = when (level) {
-                    Data -> Color.valueOf("#0f0")
-                    NoData -> Color.ORANGE
-                    NoConnection -> Color.RED
-                }
-                val x = index * 4.0
-                gc.fillRect(x, 0.0, 4.0, 12.0)
-            }
+            val x = index * 4.0
+            gc.fillRect(x, 0.0, 4.0, 12.0)
         }
     }
 

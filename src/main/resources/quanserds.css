@@ -29,6 +29,10 @@
     -fx-font-family: sans-serif;
 }
 
+.keyboard-control-label {
+    -fx-text-fill: lime;
+}
+
 /* ==================== Context Menus ==================== */
 
 .menu-item {
@@ -307,38 +311,4 @@
 
 .custom-color-dialog .text {
     -fx-font-family: sans-serif;
-}
-
-
-/* ==================== List View ==================== */
-
-
-.list-view {
-    -fx-focus-color: transparent;
-    -fx-border-color: #5a8ade;
-    -fx-border-width: 2;
-    -fx-border-insets: 0;
-    -fx-background-insets: 0;
-    -fx-padding: 0;
-}
-
-.list-view:focused {
-    -fx-border-color: #fff000;
-}
-
-.list-view .text {
-    -fx-font-family: sans-serif;
-}
-
-.list-cell {
-    -fx-background-insets: 0;
-    -fx-text-fill: white;
-    -fx-background-color: #1e2e4a;
-    -fx-accent: #5a8ade;
-    -fx-padding: 0 4 0 4;
-    -fx-border-width: 0;
-}
-
-.list-cell:selected {
-    -fx-background-color: #5a8ade;
 }
