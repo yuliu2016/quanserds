@@ -66,12 +66,15 @@ class Scheduler(private val panels: List<ControlPanel>) : DSManager {
         }
     }
 
+    private var updateFrames = 0
+
     private fun periodicAwaitConnection() {
         if (commServer.acceptAsynchronously()) {
             // Established a connection; begin to read data
             client = commServer.clientAddress
             updatePingStatus(CommLevel.NoData)
             state = Connected
+            updateFrames = 0
         }
     }
 
@@ -92,7 +95,7 @@ class Scheduler(private val panels: List<ControlPanel>) : DSManager {
 
         // Step 2 - Add all requests for data and commands
         panels.forEach {
-            it.periodicRequestData()
+            it.periodicRequestData(updateFrames)
         }
 
         // Step 3 - Run commands
@@ -101,8 +104,9 @@ class Scheduler(private val panels: List<ControlPanel>) : DSManager {
         commands.removeAll(finished)
         commands.forEach { it.execute() }
 
-        // Step 4 - Deliver
+        // Step 4 - Deliver and move on to next frame
         commServer.sendQueue()
+        updateFrames += 1
     }
 
     private fun parseContainers(containers: List<Container>) {
@@ -140,6 +144,7 @@ class Scheduler(private val panels: List<ControlPanel>) : DSManager {
     }
 
     override fun stopAll() {
+        timer2.stop()
         commServer.close()
     }
 

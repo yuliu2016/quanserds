@@ -46,7 +46,7 @@ interface ControlPanel {
      * All data that the interface needs to update
      * (without user interaction) should happen here
      */
-    fun periodicRequestData()
+    fun periodicRequestData(frame: Int)
 
     /**
      * Filtered data according to mailFilter

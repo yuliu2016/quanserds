@@ -31,7 +31,7 @@ class TablePanel : ControlPanel {
         dsManager = manager
     }
 
-    override fun periodicRequestData() {
+    override fun periodicRequestData(frame: Int) {
         val ds = dsManager
         ds.postMail(srv02BottleTable_RequestEncoder(0))
         ds.postMail(srv02BottleTable_RequestTOF(0))

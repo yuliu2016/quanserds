@@ -34,7 +34,7 @@ class QArmPanel : ControlPanel {
     private var w = 0.0
     private var g = 0.0
 
-    override fun periodicRequestData() {
+    override fun periodicRequestData(frame: Int) {
         val m = dsManager
         m.postMail(
             CommAPI.qarm_CommandAndRequestState(

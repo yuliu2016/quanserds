@@ -23,7 +23,7 @@ class AutoclavePanel : ControlPanel {
     override val icon = MaterialDesignF.FILE_CABINET
     override val mailFilter = listOf(CommAPI.ID_AUTOCLAVE, CommAPI.ID_EMG_INTERFACE, CommAPI.ID_GENERIC_SPAWNER)
 
-    override fun periodicRequestData() {
+    override fun periodicRequestData(frame: Int) {
     }
 
     private lateinit var dsManager: DSManager

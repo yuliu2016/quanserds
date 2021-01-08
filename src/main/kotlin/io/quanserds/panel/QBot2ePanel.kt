@@ -11,8 +11,11 @@ import javafx.geometry.Insets
 import javafx.geometry.Pos
 import javafx.scene.canvas.GraphicsContext
 import javafx.scene.control.*
+import javafx.scene.image.Image
 import javafx.scene.input.KeyCode
 import javafx.scene.input.KeyEvent
+import javafx.scene.layout.Background
+import javafx.scene.layout.BackgroundFill
 import javafx.scene.paint.Color
 import javafx.scene.shape.ArcType
 import javafx.scene.shape.StrokeLineCap
@@ -38,7 +41,7 @@ class QBot2ePanel : ControlPanel {
         dsManager = manager
     }
 
-    override fun periodicRequestData() {
+    override fun periodicRequestData(frame: Int) {
         val ds = dsManager
         var fSpeed = 0f
         var fTurn = 0f
@@ -55,6 +58,11 @@ class QBot2ePanel : ControlPanel {
             fTurn *= 8
         }
         ds.postMail(qbot2e_CommandAndRequestState(0, fSpeed, fTurn))
+        if (frame % 2 == 0) {
+            ds.postMail(qbot2e_RequestRGB(0))
+        } else {
+            ds.postMail(qbot2e_RequestDepth(0))
+        }
     }
 
     override fun onKeyPressed(e: KeyEvent) {
@@ -86,13 +94,27 @@ class QBot2ePanel : ControlPanel {
         containers.forEach { it.parse() }
     }
 
-    private fun Container.parse() {
-        when (deviceFunction) {
-            FCN_QBOT_RESPONSE_STATE -> {
-                val state = qbot2e_ResponseState(this)
-                updateQBotState(state)
-                updateRobotDrawing(state)
-            }
+    private fun Container.parse() = when (deviceFunction) {
+        FCN_QBOT_RESPONSE_STATE -> {
+            val state = qbot2e_ResponseState(this)
+            updateQBotState(state)
+            updateRobotDrawing(state)
+        }
+        FCN_QARM_RESPONSE_RGB -> {
+            val img = Image(qbot2e_ResponseRGB(this).inputStream())
+            val color = img.pixelReader.getColor(240, 320)
+            co.text = "%02x%02x%02x".format(
+                (color.red * 255).toInt(),
+                (color.green * 255).toInt(),
+                (color.blue * 255).toInt()
+            )
+            colorIndicator.background = Background(BackgroundFill(color, null, null))
+        }
+        FCN_QARM_RESPONSE_DEPTH -> {
+            val img = Image(qbot2e_ResponseDepth(this).inputStream())
+            de.text = img.pixelReader.getColor(240, 320).green.f
+        }
+        else -> {
         }
     }
 
@@ -143,6 +165,11 @@ class QBot2ePanel : ControlPanel {
             4.0, 4.0, 52.0, 52.0,
             (startAngle + 125.0) % 360, 55.0, ArcType.OPEN
         )
+    }
+
+    private val colorIndicator = hbox {
+        height(4.0)
+        background = Background(BackgroundFill(Color.BLACK, null, null))
     }
 
     private val wx = tf()
@@ -257,10 +284,7 @@ class QBot2ePanel : ControlPanel {
     private val panel2 = vbox {
         spacing = 4.0
         align(Pos.TOP_CENTER)
-        add(vertBox("Colour", hbox {
-            height(4.0)
-            style = "-fx-background-color: #ffdc0c"
-        }, co))
+        add(vertBox("Colour", colorIndicator, co))
         add(vertBox("Depth", de))
         add(vertBox("Heading", he))
         add(vertBox("Gyro", gy))

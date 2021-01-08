@@ -28,7 +28,7 @@ class CommsPanel : ControlPanel {
 
     override val mailFilter = listOf<Int>()
 
-    override fun periodicRequestData() {
+    override fun periodicRequestData(frame: Int) {
     }
 
     private lateinit var dsManager: DSManager
