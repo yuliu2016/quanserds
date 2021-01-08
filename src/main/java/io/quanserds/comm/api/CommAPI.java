@@ -304,7 +304,7 @@ public class CommAPI {
         return ProximityData.fromPayload(container.getPayload());
     }
 
-    public static float srv02BottleTable_ResponesLoadMass(Container container) {
+    public static float srv02BottleTable_ResponseLoadMass(Container container) {
         return unpackFloat(container);
     }
 

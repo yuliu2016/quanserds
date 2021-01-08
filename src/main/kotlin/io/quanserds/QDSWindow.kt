@@ -64,8 +64,8 @@ class QDSWindow(private val stage: Stage, private val panels: List<ControlPanel>
             add(Button("", fontIcon(MaterialDesignW.WINDOW_CLOSE, 20)).also {
                 it.tooltip = Tooltip("Close Window")
                 it.setOnMouseClicked {
-                    stage.close()
                     scheduler.stopAll()
+                    stage.close()
                 }
             })
         })

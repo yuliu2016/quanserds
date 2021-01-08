@@ -2,7 +2,7 @@ package io.quanserds.panel
 
 import io.quanserds.ControlPanel
 import io.quanserds.DSManager
-import io.quanserds.comm.api.CommAPI
+import io.quanserds.comm.api.CommAPI.*
 import io.quanserds.comm.api.Container
 import io.quanserds.fx.*
 import io.quanserds.icon.fontIcon
@@ -16,13 +16,14 @@ import org.kordamp.ikonli.materialdesign2.MaterialDesignT
 
 class TablePanel : ControlPanel {
 
+    companion object {
+        private const val kEnc = 360.0 / 4096
+    }
+
     override val name = "Table"
     override val icon = MaterialDesignF.FERRIS_WHEEL
 
-    override val mailFilter = listOf(CommAPI.ID_SRV02BOTTLETABLE, CommAPI.ID_SCALE)
-
-    override fun periodicRequestData() {
-    }
+    override val mailFilter = listOf(ID_SRV02BOTTLETABLE, ID_SCALE)
 
     private lateinit var dsManager: DSManager
 
@@ -30,7 +31,81 @@ class TablePanel : ControlPanel {
         dsManager = manager
     }
 
+    override fun periodicRequestData() {
+        val ds = dsManager
+        ds.postMail(srv02BottleTable_RequestEncoder(0))
+        ds.postMail(srv02BottleTable_RequestTOF(0))
+        if (isShortProx) {
+            ds.postMail(srv02BottleTable_RequestProximityShort(0))
+        } else {
+            ds.postMail(srv02BottleTable_RequestProximityTall(0))
+        }
+        ds.postMail(srv02BottleTable_RequestLoadMass(0))
+
+        // scale
+        ds.postMail(scale_RequestLoadMass(0))
+    }
+
     override fun periodicResponseData(containers: List<Container>) {
+        containers.forEach { it.parse() }
+    }
+
+    private fun Container.parse() = when (deviceFunction) {
+        FCN_SRV02BT_RESPONSE_ENCODER -> {
+            val enc = srv02BottleTable_ResponseEncoder(this)
+            encoder.text = enc.toString()
+            angle.text = (enc * kEnc % 360.0).f
+        }
+        FCN_SRV02BT_RESPONSE_TOF -> {
+            val tofv = srv02BottleTable_ResponseTOF(this)
+            tof.text = tofv.f
+        }
+        FCN_SRV02BT_RESPONSE_PROXIMITY_TALL,
+        FCN_SRV02BT_RESPONSE_PROXIMITY_SHORT -> {
+            val s = srv02BottleTable_ResponseProximityTall(this)
+            proxX.text = s.relative_x.f
+            proxY.text = s.relative_y.f
+            proxZ.text = s.relative_z.f
+            proxP.text = s.properties.ifBlank { "No Proximity Properties" }
+        }
+        FCN_SRV02BT_RESPONSE_LOAD_MASS -> when (deviceID) {
+            ID_SCALE -> scale.text = scale_ResponesLoadMass(this).f
+            ID_SRV02BOTTLETABLE -> mass.text =
+                srv02BottleTable_ResponseLoadMass(this).f
+            else -> {
+            }
+        }
+        else -> {
+        }
+    }
+
+    private val shortRadio = RadioButton("Short")
+    private val tallRadio = RadioButton("Tall")
+    private var isShortProx = true
+
+    init {
+        val g = ToggleGroup()
+        shortRadio.toggleGroup = g
+        tallRadio.toggleGroup = g
+        shortRadio.isSelected = true
+        shortRadio.selectedProperty().addListener { _, _, nv ->
+            isShortProx = nv
+        }
+    }
+
+    private val encoder = tf()
+    private val angle = tf()
+    private val mass = tf()
+    private val tof = tf()
+    private val scale = tf()
+
+    private val proxX = tf()
+    private val proxY = tf()
+    private val proxZ = tf()
+    private val proxP = textField {
+        width(186.0)
+        isEditable = false
+        text = "No Proximity Properties"
     }
 
     private val leftPanel = vbox {
@@ -51,16 +126,9 @@ class TablePanel : ControlPanel {
 
         add(hbox {
             spacing = 8.0
-            val g = ToggleGroup()
-            val a = RadioButton("Short")
-
-            val b = RadioButton("Tall")
-            a.toggleGroup = g
-            b.toggleGroup = g
-            a.isSelected = true
             add(label("Proximity Sensor"))
-            add(a)
-            add(b)
+            add(shortRadio)
+            add(tallRadio)
         })
 
         add(gridPane {
@@ -69,27 +137,10 @@ class TablePanel : ControlPanel {
             add(gridLabel("x"), 0, 0)
             add(gridLabel("y"), 1, 0)
             add(gridLabel("z"), 2, 0)
-            add(textField {
-                width(80.0)
-                text = "0.0"
-                isEditable = false
-            }, 0, 1)
-            add(textField {
-                width(80.0)
-                text = "0.0"
-                isEditable = false
-            }, 1, 1)
-            add(textField {
-                width(80.0)
-                text = "0.0"
-                isEditable = false
-            }, 2, 1)
-
-            add(textField {
-                width(256.0)
-                isEditable = false
-                text = "No Proximity Properties"
-            }, 0, 2, 3, 1)
+            add(proxX, 0, 1)
+            add(proxY, 1, 1)
+            add(proxZ, 2, 1)
+            add(proxP, 0, 2, 3, 1)
         })
 
 
