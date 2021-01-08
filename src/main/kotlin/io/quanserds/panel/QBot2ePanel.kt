@@ -24,6 +24,10 @@ import org.kordamp.ikonli.materialdesign2.*
 
 class QBot2ePanel : ControlPanel {
 
+    companion object {
+        private const val QBOT_RADIUS = 0.235 / 2.0
+    }
+
     override val name = "QBot2e"
     override val icon = MaterialDesignR.ROBOT_VACUUM
 
@@ -55,9 +59,17 @@ class QBot2ePanel : ControlPanel {
         }
         if (keyShift) {
             fSpeed *= 4
-            fTurn *= 8
+            fTurn *= 4
+        }
+        if (!fastRadio.isSelected) {
+            fSpeed /= 4
+            fTurn /= 4
         }
         ds.postMail(qbot2e_CommandAndRequestState(0, fSpeed, fTurn))
+        sp.text = fSpeed.f
+        tu.text = fTurn.f
+        vl.text = (fSpeed - fTurn * QBOT_RADIUS).f
+        vr.text = (fSpeed + fTurn * QBOT_RADIUS).f
         if (frame % 2 == 0) {
             ds.postMail(qbot2e_RequestRGB(0))
         } else {
@@ -192,6 +204,9 @@ class QBot2ePanel : ControlPanel {
     private val he = tf()
     private val gy = tf()
 
+    private val sp = tf()
+    private val tu = tf()
+
     private fun updateQBotState(s: QBot2eState) {
         wx.text = s.world_x.f
         wy.text = s.world_y.f
@@ -215,6 +230,16 @@ class QBot2ePanel : ControlPanel {
         width(38.0)
     }
 
+    private val fastRadio = RadioButton("Fast")
+    private val slowRadio = RadioButton("Slow")
+
+    init {
+        val group = ToggleGroup()
+        fastRadio.toggleGroup = group
+        slowRadio.toggleGroup = group
+        fastRadio.isSelected = true
+    }
+
     private val mainPanel = vbox {
         spacing = 8.0
 
@@ -222,26 +247,18 @@ class QBot2ePanel : ControlPanel {
             hgap = 8.0
             vgap = 4.0
 
-            val group = ToggleGroup()
-
-            add(RadioButton("Fast").apply { toggleGroup = group; isSelected = true }, 0, 0)
-            add(RadioButton("Slow").apply { toggleGroup = group }, 0, 1)
+            add(fastRadio, 0, 0)
+            add(slowRadio, 0, 1)
 
             add(makeLetterLabel("W", MaterialDesignA.ARROW_UP), 1, 0)
             add(makeLetterLabel("S", MaterialDesignA.ARROW_DOWN), 2, 0)
             add(label("Speed"), 3, 0)
-            add(textField {
-                text = "0"
-                width(60.0)
-            }, 4, 0)
+            add(sp, 4, 0)
 
             add(makeLetterLabel("A", MaterialDesignR.ROTATE_LEFT), 1, 1)
             add(makeLetterLabel("D", MaterialDesignR.ROTATE_RIGHT), 2, 1)
             add(label("Turn"), 3, 1)
-            add(textField {
-                text = "0"
-                width(60.0)
-            }, 4, 1)
+            add(tu, 4, 1)
         })
 
         add(gridPane {

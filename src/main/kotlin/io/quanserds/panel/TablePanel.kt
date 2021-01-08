@@ -35,7 +35,7 @@ class TablePanel : ControlPanel {
         val ds = dsManager
         ds.postMail(srv02BottleTable_RequestEncoder(0))
         ds.postMail(srv02BottleTable_RequestTOF(0))
-        if (isShortProx) {
+        if (shortRadio.isSelected) {
             ds.postMail(srv02BottleTable_RequestProximityShort(0))
         } else {
             ds.postMail(srv02BottleTable_RequestProximityTall(0))
@@ -81,16 +81,12 @@ class TablePanel : ControlPanel {
 
     private val shortRadio = RadioButton("Short")
     private val tallRadio = RadioButton("Tall")
-    private var isShortProx = true
 
     init {
         val g = ToggleGroup()
         shortRadio.toggleGroup = g
         tallRadio.toggleGroup = g
         shortRadio.isSelected = true
-        shortRadio.selectedProperty().addListener { _, _, nv ->
-            isShortProx = nv
-        }
     }
 
     private val encoder = tf()
