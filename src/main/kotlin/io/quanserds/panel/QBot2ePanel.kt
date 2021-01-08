@@ -5,6 +5,7 @@ import io.quanserds.DSManager
 import io.quanserds.comm.api.CommAPI.*
 import io.quanserds.comm.api.Container
 import io.quanserds.comm.struct.QBot2eState
+import io.quanserds.command.Command
 import io.quanserds.fx.*
 import io.quanserds.icon.fontIcon
 import javafx.geometry.Insets
@@ -21,6 +22,8 @@ import javafx.scene.shape.ArcType
 import javafx.scene.shape.StrokeLineCap
 import org.kordamp.ikonli.Ikon
 import org.kordamp.ikonli.materialdesign2.*
+import kotlin.math.cos
+import kotlin.math.sin
 
 class QBot2ePanel : ControlPanel {
 
@@ -307,6 +310,59 @@ class QBot2ePanel : ControlPanel {
         add(vertBox("Gyro", gy))
     }
 
+    @Suppress("SameParameterValue")
+    private fun setBoxAttribute(
+        x: Double, y: Double, z: Double, pitch: Double, roll: Double, yaw: Double
+    ) {
+        dsManager.postMail(
+            qbot2eBox_Command(
+                0,
+                x.toFloat(), y.toFloat(), z.toFloat(),
+                pitch.toFloat(), roll.toFloat(), yaw.toFloat()
+            )
+        )
+    }
+
+    private fun setBoxAngle(theta: Double) {
+        setBoxAttribute(
+            0.0, 0.15 * (1 - cos(theta)), 0.15 * sin(theta),
+            theta, 0.0, 0.0
+        )
+    }
+
+    private var dumpCommandRunning = false
+
+    private fun dump() {
+        if (!dumpCommandRunning) {
+            dumpCommandRunning = true
+            dsManager.submit(DumpCommand())
+        }
+    }
+
+    private inner class DumpCommand : Command {
+        override fun start() {
+        }
+
+        private var dumpCount = 0
+
+        override fun isFinished(): Boolean {
+            return dumpCount >= 100
+        }
+
+        override fun execute() {
+            val j = (dumpCount / 100.0) * (2 * Math.PI)
+            val theta = 1 - cos(j)
+
+            setBoxAngle(theta)
+            dumpCount += 1
+        }
+
+        override fun stop() {
+            setBoxAngle(0.0)
+            dumpCommandRunning = false
+        }
+    }
+
     private val megaPanel = vbox {
 
         styleClass("modular-panel")
@@ -326,11 +382,9 @@ class QBot2ePanel : ControlPanel {
             spacing = 8.0
             add(Button("", fontIcon(MaterialDesignS.SLOPE_DOWNHILL, 20)).apply {
                 tooltip = Tooltip("Dump the Box")
+                setOnAction { dump() }
             })
             hspace()
-            add(Button("", fontIcon(MaterialDesignS.STOP, 20)).apply {
-                tooltip = Tooltip("Move to Home")
-            })
             add(Button("", fontIcon(MaterialDesignI.INFORMATION_OUTLINE, 20)).apply {
                 tooltip = Tooltip("QBot2e Info")
             })

@@ -165,13 +165,13 @@ public class QBot2e {
     }
 
     private void setBoxAngle(double theta) {
-        setBoxAttribute(0, 0.15 * (1 - Math.cos(theta)), 0.15 * (1 - Math.sin(theta)),
+        setBoxAttribute(0, 0.15 * (1 - Math.cos(theta)), 0.15 * Math.sin(theta),
                 theta, 0, 0);
     }
 
     public void dump() {
         for (int i = 0; i < 100; i++) {
-            var j = (1 / 100.0) * (2 * Math.PI);
+            var j = (i / 100.0) * (2 * Math.PI);
             setBoxAngle(1 - Math.cos(j));
         }
     }
