@@ -9,6 +9,7 @@ import io.quanserds.icon.fontIcon
 import javafx.geometry.Insets
 import javafx.geometry.Pos
 import javafx.scene.control.*
+import javafx.util.StringConverter
 import org.kordamp.ikonli.materialdesign2.MaterialDesignF
 import org.kordamp.ikonli.materialdesign2.MaterialDesignI
 import org.kordamp.ikonli.materialdesign2.MaterialDesignR
@@ -104,6 +105,50 @@ class TablePanel : ControlPanel {
         text = "No Proximity Properties"
     }
 
+    private val metalRadio = RadioButton("Metal")
+    private val plasticRadio = RadioButton("Plastic")
+
+    private val alphaSlider = slider {
+        value = 100.0
+        width(120.0)
+    }
+
+    private val alphaField = tf()
+
+    init {
+        val g = ToggleGroup()
+        metalRadio.toggleGroup = g
+        plasticRadio.toggleGroup = g
+        metalRadio.isSelected = true
+
+        alphaField.textProperty().bindBidirectional(alphaSlider.valueProperty(),
+            object : StringConverter<Number>() {
+                override fun toString(ob: Number): String {
+                    return ob.toInt().toString() + "%"
+                }
+
+                override fun fromString(string: String?): Number {
+                    error("Can't convert back")
+                }
+            })
+    }
+
+    private val colorRadio = RadioButton("")
+    private val randomRadio = RadioButton("Random")
+
+    private val colorPicker = ColorPicker().apply {
+        this.width(120.0)
+        this.translateX = 8.0
+    }
+
+    init {
+        val g = ToggleGroup()
+        colorRadio.toggleGroup = g
+        randomRadio.toggleGroup = g
+        randomRadio.isSelected = true
+        colorRadio.graphic = colorPicker
+    }
+
     private val leftPanel = vbox {
         spacing = 8.0
         add(hbox {
@@ -144,47 +189,24 @@ class TablePanel : ControlPanel {
 
         add(hbox {
             spacing = 8.0
-            val g = ToggleGroup()
-            val a = RadioButton("Metal")
-            val b = RadioButton("Plastic")
-            a.toggleGroup = g
-            b.toggleGroup = g
-            a.isSelected = true
             add(label("Material"))
-            add(a)
-            add(b)
+            add(metalRadio)
+            add(plasticRadio)
         })
 
         add(hbox {
             align(Pos.CENTER_LEFT)
             spacing = 8.0
             add(label("Alpha"))
-            add(slider {
-                value = 100.0
-                width(120.0)
-            })
-            add(textField {
-                text = "1.0"
-                width(60.0)
-            })
+            add(alphaSlider)
+            add(alphaField)
         })
 
         add(hbox {
             align(Pos.CENTER_LEFT)
             spacing = 16.0
-            val g = ToggleGroup()
-            val a = RadioButton("")
-            val b = RadioButton("Random")
-            a.toggleGroup = g
-            b.toggleGroup = g
-            a.isSelected = true
-            a.graphic = ColorPicker().apply {
-                this.width(120.0)
-                this.translateX = 8.0
-            }
-            a.contentDisplay = ContentDisplay.GRAPHIC_ONLY
-            add(a)
-            add(b)
+            add(colorRadio)
+            add(randomRadio)
         })
     }
 
@@ -196,6 +218,31 @@ class TablePanel : ControlPanel {
         add(vertBox("Mass", tf()))
         add(vertBox("TOF", tf()))
         add(vertBox("Scale", tf()))
+    }
+
+    private fun spawn() {
+        val metal = metalRadio.isSelected
+        val r: Float
+        val g: Float
+        val b: Float
+        if (randomRadio.isSelected) {
+            r = Math.random().toFloat()
+            g = Math.random().toFloat()
+            b = Math.random().toFloat()
+        } else {
+            val c = colorPicker.value
+            r = c.red.toFloat()
+            g = c.green.toFloat()
+            b = c.blue.toFloat()
+        }
+        val alpha = alphaSlider.value / 100.0
+        val cont = srv02BottleTable_SpawnContainer(
+            0, 0.1f, 0.65f, if (metal) 1 else 0,
+            r, g, b, alpha.toFloat(), 1f, 1f,
+            if (metal) "metal" else "plastic"
+        )
+
+        dsManager.postMail(cont)
     }
 
     private val megaPanel = vbox {
@@ -214,7 +261,9 @@ class TablePanel : ControlPanel {
         add(hbox {
             align(Pos.CENTER_RIGHT)
             spacing = 8.0
-            add(Button("", fontIcon(MaterialDesignT.TRANSFER_DOWN, 20)))
+            add(Button("", fontIcon(MaterialDesignT.TRANSFER_DOWN, 20)).apply {
+                setOnAction { spawn() }
+            })
             hspace()
             add(Button("", fontIcon(MaterialDesignR.REWIND_5, 20)).apply {
                 tooltip = Tooltip("Turn 5 deg counter-clockwise")
