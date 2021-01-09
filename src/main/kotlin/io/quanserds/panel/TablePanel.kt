@@ -9,6 +9,8 @@ import io.quanserds.icon.fontIcon
 import javafx.geometry.Insets
 import javafx.geometry.Pos
 import javafx.scene.control.*
+import javafx.scene.input.KeyCode
+import javafx.scene.input.KeyEvent
 import javafx.util.StringConverter
 import org.kordamp.ikonli.materialdesign2.MaterialDesignF
 import org.kordamp.ikonli.materialdesign2.MaterialDesignI
@@ -32,8 +34,21 @@ class TablePanel : ControlPanel {
         dsManager = manager
     }
 
+    private var keyQ = false
+    private var keyE = false
+
     override fun periodicRequestData(frame: Int) {
         val ds = dsManager
+
+        var speed = 0f
+        if (keyQ) {
+            speed -= 1f
+        }
+        if (keyE) {
+            speed += 1f
+        }
+        ds.postMail(srv02BottleTable_CommandSpeed(0, speed))
+
         ds.postMail(srv02BottleTable_RequestEncoder(0))
         ds.postMail(srv02BottleTable_RequestTOF(0))
         if (shortRadio.isSelected) {
@@ -51,11 +66,37 @@ class TablePanel : ControlPanel {
         containers.forEach { it.parse() }
     }
 
+    override fun onKeyPressed(e: KeyEvent) {
+        when (e.code) {
+            KeyCode.Q -> {
+                keyQ = true
+            }
+            KeyCode.E -> {
+                keyE = true
+            }
+            else -> {
+            }
+        }
+    }
+
+    override fun onKeyReleased(e: KeyEvent) {
+        when (e.code) {
+            KeyCode.Q -> {
+                keyQ = false
+            }
+            KeyCode.E -> {
+                keyE = false
+            }
+            else -> {
+            }
+        }
+    }
+
     private fun Container.parse() = when (deviceFunction) {
         FCN_SRV02BT_RESPONSE_ENCODER -> {
             val enc = srv02BottleTable_ResponseEncoder(this)
-            encoder.text = enc.toString()
-            angle.text = (enc * kEnc % 360.0).f
+            encoder.text = (enc * kEnc / 360.0).f
+            angle.text = (enc * kEnc % 360.0).f + "°"
         }
         FCN_SRV02BT_RESPONSE_TOF -> {
             val tofv = srv02BottleTable_ResponseTOF(this)
@@ -212,11 +253,11 @@ class TablePanel : ControlPanel {
     private val rightPanel = vbox {
         spacing = 4.0
         align(Pos.TOP_CENTER)
-        add(vertBox("Encoder", tf()))
-        add(vertBox("Angle", tf()))
-        add(vertBox("Mass", tf()))
-        add(vertBox("TOF", tf()))
-        add(vertBox("Scale", tf()))
+        add(vertBox("Encoder", encoder))
+        add(vertBox("Angle", angle))
+        add(vertBox("Mass", mass))
+        add(vertBox("TOF", tof))
+        add(vertBox("Scale", scale))
     }
 
     private fun spawn() {

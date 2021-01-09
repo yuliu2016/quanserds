@@ -82,19 +82,19 @@ class QBot2ePanel : ControlPanel {
         when (e.code) {
             KeyCode.W -> {
                 keyW = true
-                wLabel.astyle()
+                wLabel.kActiveStyle()
             }
             KeyCode.S -> {
                 keyS = true
-                sLabel.astyle()
+                sLabel.kActiveStyle()
             }
             KeyCode.A -> {
                 keyA = true
-                aLabel.astyle()
+                aLabel.kActiveStyle()
             }
             KeyCode.D -> {
                 keyD = true
-                dLabel.astyle()
+                dLabel.kActiveStyle()
             }
             KeyCode.SHIFT -> keyShift = true
             else -> {
@@ -104,32 +104,24 @@ class QBot2ePanel : ControlPanel {
 
     override fun onKeyReleased(e: KeyEvent) = when (e.code) {
         KeyCode.W -> {
-            if (keyW) wLabel.rstyle()
+            if (keyW) wLabel.kControlStyle()
             keyW = false
         }
         KeyCode.S -> {
-            if (keyS) sLabel.rstyle()
+            if (keyS) sLabel.kControlStyle()
             keyS = false
         }
         KeyCode.A -> {
-            if (keyA) aLabel.rstyle()
+            if (keyA) aLabel.kControlStyle()
             keyA = false
         }
         KeyCode.D -> {
-            if (keyD) dLabel.rstyle()
+            if (keyD) dLabel.kControlStyle()
             keyD = false
         }
         KeyCode.SHIFT -> keyShift = false
         else -> {
         }
-    }
-
-    private fun Label.astyle() {
-        styleClass.add("keyboard-activated")
-    }
-
-    private fun Label.rstyle() {
-        styleClass.setAll("keyboard-control-label")
     }
 
     override fun periodicResponseData(containers: List<Container>) {

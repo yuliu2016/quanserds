@@ -33,3 +33,11 @@ fun gridLabel(text: String): Label {
         GridPane.setHalignment(this, HPos.CENTER)
     }
 }
+
+fun Label.kActiveStyle() {
+    styleClass.add("keyboard-activated")
+}
+
+fun Label.kControlStyle() {
+    styleClass.setAll("keyboard-control-label")
+}
