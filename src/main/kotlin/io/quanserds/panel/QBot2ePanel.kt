@@ -150,6 +150,7 @@ class QBot2ePanel : ControlPanel {
                 (color.green * 255).toInt(),
                 (color.blue * 255).toInt()
             )
+            rgbImageView.image = img
             colorIndicator.background = Background(BackgroundFill(color, null, null))
         }
         FCN_QARM_RESPONSE_DEPTH -> {
@@ -272,6 +273,11 @@ class QBot2ePanel : ControlPanel {
     private val aLabel = makeLetterLabel("A", MaterialDesignR.ROTATE_LEFT)
     private val dLabel = makeLetterLabel("D", MaterialDesignR.ROTATE_RIGHT)
 
+    private val rgbImageView = imageView {
+        this.isPreserveRatio = true
+        this.fitWidth = 60.0
+    }
+
     private val mainPanel = vbox {
         spacing = 8.0
 
@@ -287,6 +293,8 @@ class QBot2ePanel : ControlPanel {
 
             add(aLabel, 1, 1)
             add(dLabel, 2, 1)
+
+            add(rgbImageView, 3, 0, 1, 2)
         })
 
         add(gridPane {

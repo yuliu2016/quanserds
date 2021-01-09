@@ -11,11 +11,13 @@ import javafx.geometry.Insets
 import javafx.geometry.Pos
 import javafx.scene.Node
 import javafx.scene.control.Button
+import javafx.scene.control.ColorPicker
 import javafx.scene.control.Slider
 import javafx.scene.control.Tooltip
 import javafx.scene.input.KeyCode
 import javafx.scene.input.KeyEvent
 import javafx.scene.layout.GridPane
+import javafx.scene.paint.Color
 import javafx.util.StringConverter
 import org.kordamp.ikonli.materialdesign2.*
 
@@ -34,6 +36,10 @@ class QArmPanel : ControlPanel {
     private var w = 0.0
     private var g = 0.0
 
+    private var cR = 1f
+    private var cG = 0f
+    private var cB = 0f
+
     override fun periodicRequestData(frame: Int) {
         val m = dsManager
         m.postMail(
@@ -44,9 +50,9 @@ class QArmPanel : ControlPanel {
                 e.toFloat(),
                 w.toFloat(),
                 g.toFloat(),
-                0f,
-                0f,
-                1f,
+                cR,
+                cG,
+                cB,
                 1f
             )
         )
@@ -61,18 +67,28 @@ class QArmPanel : ControlPanel {
 
 
     private val epx = textField {
-        width(80.0)
+        width(60.0)
         text = "0.4064"
     }
 
     private val epy = textField {
-        width(80.0)
+        width(60.0)
         text = "0.0000"
     }
 
     private val epz = textField {
-        width(80.0)
+        width(60.0)
         text = "0.4826"
+    }
+
+    private val basePicker = ColorPicker().apply {
+        width(60.0)
+        this.value = Color.RED
+        valueProperty().addListener { _, _, nv ->
+            cR = nv.red.toFloat()
+            cG = nv.green.toFloat()
+            cB = nv.blue.toFloat()
+        }
     }
 
     private fun makeSlider(min: Int, max: Int) = slider {
@@ -117,9 +133,11 @@ class QArmPanel : ControlPanel {
             add(gridLabel("x"), 0, 0)
             add(gridLabel("y"), 1, 0)
             add(gridLabel("z"), 2, 0)
+            add(gridLabel("Base"), 3, 0)
             add(epx, 0, 1)
             add(epy, 1, 1)
             add(epz, 2, 1)
+            add(basePicker, 3, 1)
         })
         add(gridPane {
             hgap = 8.0
@@ -172,9 +190,6 @@ class QArmPanel : ControlPanel {
                     gSlider.value = 0.0
                 }
                 tooltip = Tooltip("Move to Home")
-            })
-            add(Button("", fontIcon(MaterialDesignP.PALETTE_OUTLINE, 20)).apply {
-                tooltip = Tooltip("Change Base Colour")
             })
             add(Button("", fontIcon(MaterialDesignI.INFORMATION_OUTLINE, 20)).apply {
                 tooltip = Tooltip("QArm Info")

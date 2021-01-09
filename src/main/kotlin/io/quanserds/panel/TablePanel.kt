@@ -137,7 +137,6 @@ class TablePanel : ControlPanel {
     private val randomRadio = RadioButton("Random")
 
     private val colorPicker = ColorPicker().apply {
-        this.width(120.0)
         this.translateX = 8.0
     }
 
