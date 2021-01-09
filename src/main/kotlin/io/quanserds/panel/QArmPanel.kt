@@ -161,23 +161,13 @@ class QArmPanel : ControlPanel {
             }
         })
 
-        vspace()
-
-        add(gridPane {
-            hgap = 10.0
-            vgap = 4.0
-            add(fingerPad(), 0, 0)
-            add(fingerPad(), 1, 0)
-            add(fingerPad(), 2, 0)
-            add(fingerPad(), 3, 0)
-        })
-
         add(textField {
             isEditable = false
             text = "No Gripped Object"
             width(256.0)
         })
 
+        vspace()
 
         add(hbox {
             align(Pos.CENTER_RIGHT)
@@ -196,14 +186,6 @@ class QArmPanel : ControlPanel {
                 tooltip = Tooltip("QArm Info")
             })
         })
-    }
-
-    private fun fingerPad(): Node {
-        return hbox {
-            height(4.0)
-            width(56.0)
-            style = "-fx-background-color: orange;"
-        }
     }
 
     private fun GridPane.makeSliderBar(

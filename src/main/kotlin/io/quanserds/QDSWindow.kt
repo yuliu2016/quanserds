@@ -99,6 +99,9 @@ class QDSWindow(private val stage: Stage, private val panels: List<ControlPanel>
                 panel.onKeyReleased(it)
             }
         }
+        setOnMouseClicked {
+            content.requestFocus()
+        }
 
         stylesheets.addAll("/quanserds.css")
     }

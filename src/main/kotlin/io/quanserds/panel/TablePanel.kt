@@ -203,19 +203,6 @@ class TablePanel : ControlPanel {
 
     private val leftPanel = vbox {
         spacing = 8.0
-        add(hbox {
-            align(Pos.CENTER_LEFT)
-            spacing = 8.0
-            add(label("Velocity"))
-            add(slider {
-                value = 50.0
-                width(120.0)
-            })
-            add(textField {
-                text = "0"
-                width(60.0)
-            })
-        })
 
         add(hbox {
             spacing = 8.0
