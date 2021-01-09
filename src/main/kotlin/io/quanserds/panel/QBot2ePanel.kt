@@ -69,8 +69,6 @@ class QBot2ePanel : ControlPanel {
             fTurn /= 4
         }
         ds.postMail(qbot2e_CommandAndRequestState(0, fSpeed, fTurn))
-        sp.text = fSpeed.f
-        tu.text = fTurn.f
         vl.text = (fSpeed - fTurn * QBOT_RADIUS).f
         vr.text = (fSpeed + fTurn * QBOT_RADIUS).f
         if (frame % 2 == 0) {
@@ -81,28 +79,57 @@ class QBot2ePanel : ControlPanel {
     }
 
     override fun onKeyPressed(e: KeyEvent) {
-        if (e.isControlDown) return
         when (e.code) {
-            KeyCode.W -> keyW = true
-            KeyCode.S -> keyS = true
-            KeyCode.A -> keyA = true
-            KeyCode.D -> keyD = true
+            KeyCode.W -> {
+                keyW = true
+                wLabel.astyle()
+            }
+            KeyCode.S -> {
+                keyS = true
+                sLabel.astyle()
+            }
+            KeyCode.A -> {
+                keyA = true
+                aLabel.astyle()
+            }
+            KeyCode.D -> {
+                keyD = true
+                dLabel.astyle()
+            }
             KeyCode.SHIFT -> keyShift = true
             else -> {
             }
         }
     }
 
-    override fun onKeyReleased(e: KeyEvent) {
-        when (e.code) {
-            KeyCode.W -> keyW = false
-            KeyCode.S -> keyS = false
-            KeyCode.A -> keyA = false
-            KeyCode.D -> keyD = false
-            KeyCode.SHIFT -> keyShift = false
-            else -> {
-            }
+    override fun onKeyReleased(e: KeyEvent) = when (e.code) {
+        KeyCode.W -> {
+            if (keyW) wLabel.rstyle()
+            keyW = false
         }
+        KeyCode.S -> {
+            if (keyS) sLabel.rstyle()
+            keyS = false
+        }
+        KeyCode.A -> {
+            if (keyA) aLabel.rstyle()
+            keyA = false
+        }
+        KeyCode.D -> {
+            if (keyD) dLabel.rstyle()
+            keyD = false
+        }
+        KeyCode.SHIFT -> keyShift = false
+        else -> {
+        }
+    }
+
+    private fun Label.astyle() {
+        styleClass.add("keyboard-activated")
+    }
+
+    private fun Label.rstyle() {
+        styleClass.setAll("keyboard-control-label")
     }
 
     override fun periodicResponseData(containers: List<Container>) {
@@ -207,9 +234,6 @@ class QBot2ePanel : ControlPanel {
     private val he = tf()
     private val gy = tf()
 
-    private val sp = tf()
-    private val tu = tf()
-
     private fun updateQBotState(s: QBot2eState) {
         wx.text = s.world_x.f
         wy.text = s.world_y.f
@@ -221,16 +245,16 @@ class QBot2ePanel : ControlPanel {
         uy.text = s.up_y.f
         uz.text = s.up_z.f
 
-        el.text = s.encoder_left.toString()
-        er.text = s.encoder_right.toString()
+        el.text = (s.encoder_left / 4096.0).f
+        er.text = (s.encoder_right / 4096.0).f
 
         he.text = s.heading.f
         gy.text = s.gyro.f
     }
 
     private fun makeLetterLabel(t: String, ic: Ikon) = Label(t, fontIcon(ic, 20)).apply {
-        styleClass("keyboard-control-label")
-        width(38.0)
+        styleClass.add("keyboard-control-label")
+        padding = Insets(1.0, 6.0, 1.0, 2.0)
     }
 
     private val fastRadio = RadioButton("Fast")
@@ -243,6 +267,11 @@ class QBot2ePanel : ControlPanel {
         fastRadio.isSelected = true
     }
 
+    private val wLabel = makeLetterLabel("W", MaterialDesignA.ARROW_UP)
+    private val sLabel = makeLetterLabel("S", MaterialDesignA.ARROW_DOWN)
+    private val aLabel = makeLetterLabel("A", MaterialDesignR.ROTATE_LEFT)
+    private val dLabel = makeLetterLabel("D", MaterialDesignR.ROTATE_RIGHT)
+
     private val mainPanel = vbox {
         spacing = 8.0
 
@@ -253,15 +282,11 @@ class QBot2ePanel : ControlPanel {
             add(fastRadio, 0, 0)
             add(slowRadio, 0, 1)
 
-            add(makeLetterLabel("W", MaterialDesignA.ARROW_UP), 1, 0)
-            add(makeLetterLabel("S", MaterialDesignA.ARROW_DOWN), 2, 0)
-            add(label("Speed"), 3, 0)
-            add(sp, 4, 0)
+            add(wLabel, 1, 0)
+            add(sLabel, 2, 0)
 
-            add(makeLetterLabel("A", MaterialDesignR.ROTATE_LEFT), 1, 1)
-            add(makeLetterLabel("D", MaterialDesignR.ROTATE_RIGHT), 2, 1)
-            add(label("Turn"), 3, 1)
-            add(tu, 4, 1)
+            add(aLabel, 1, 1)
+            add(dLabel, 2, 1)
         })
 
         add(gridPane {

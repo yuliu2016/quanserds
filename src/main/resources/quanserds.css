@@ -30,7 +30,13 @@
 }
 
 .keyboard-control-label {
+    fx-background-color: transparent;
     -fx-text-fill: lime;
+}
+
+.keyboard-activated {
+    -fx-background-insets: 0, 2;
+    -fx-background-color: #fff000, #1e2e4a;
 }
 
 /* ==================== Context Menus ==================== */
