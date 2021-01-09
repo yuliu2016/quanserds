@@ -23,6 +23,8 @@ import org.kordamp.ikonli.materialdesign2.*
 
 class QArmPanel : ControlPanel {
 
+    // (S: 52deg, E: -52deg) for plastic
+
     override val name = "QArm"
     override val icon = MaterialDesignR.ROBOT_INDUSTRIAL
 
@@ -187,7 +189,6 @@ class QArmPanel : ControlPanel {
                     sSlider.value = 0.0
                     eSlider.value = 0.0
                     wSlider.value = 0.0
-                    gSlider.value = 0.0
                 }
                 tooltip = Tooltip("Move to Home")
             })

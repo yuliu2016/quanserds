@@ -16,6 +16,9 @@ import org.kordamp.ikonli.materialdesign2.MaterialDesignF
 import org.kordamp.ikonli.materialdesign2.MaterialDesignI
 import org.kordamp.ikonli.materialdesign2.MaterialDesignR
 import org.kordamp.ikonli.materialdesign2.MaterialDesignT
+import kotlin.math.abs
+import kotlin.math.min
+import kotlin.math.withSign
 
 class TablePanel : ControlPanel {
 
@@ -37,6 +40,8 @@ class TablePanel : ControlPanel {
     private var keyQ = false
     private var keyE = false
 
+    private var prevSpeed = 0f
+
     override fun periodicRequestData(frame: Int) {
         val ds = dsManager
 
@@ -47,7 +52,13 @@ class TablePanel : ControlPanel {
         if (keyE) {
             speed += 1f
         }
-        ds.postMail(srv02BottleTable_CommandSpeed(0, speed))
+
+        val diff = speed - prevSpeed // -0.2
+
+        val rampedSpeed = prevSpeed + min(abs(diff), 0.1f).withSign(diff)  // 0.2 + max(0.2, 0.2).
+        prevSpeed = rampedSpeed
+
+        ds.postMail(srv02BottleTable_CommandSpeed(0, rampedSpeed))
 
         ds.postMail(srv02BottleTable_RequestEncoder(0))
         ds.postMail(srv02BottleTable_RequestTOF(0))
@@ -74,6 +85,7 @@ class TablePanel : ControlPanel {
             KeyCode.E -> {
                 keyE = true
             }
+            KeyCode.B -> spawn()
             else -> {
             }
         }
@@ -260,7 +272,15 @@ class TablePanel : ControlPanel {
         add(vertBox("Scale", scale))
     }
 
+    private var prevSpawnTime = 0L
+
     private fun spawn() {
+        val t = System.currentTimeMillis()
+        if (t - prevSpawnTime < 400L) {
+            return
+        }
+        prevSpawnTime = t
+
         val metal = metalRadio.isSelected
         val r: Float
         val g: Float
