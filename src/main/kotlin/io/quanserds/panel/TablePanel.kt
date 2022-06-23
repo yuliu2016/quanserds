@@ -85,7 +85,7 @@ class TablePanel : ControlPanel {
             KeyCode.E -> {
                 keyE = true
             }
-            KeyCode.B -> spawn()
+            KeyCode.BACK_QUOTE -> spawn()
             else -> {
             }
         }

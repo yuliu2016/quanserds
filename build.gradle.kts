@@ -4,22 +4,21 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 plugins {
     java
     application
-    kotlin("jvm") version "1.4.21"
-    id("com.github.gmazzo.buildconfig") version "2.0.2"
-    id("org.beryx.jlink") version "2.23.1"
+    kotlin("jvm") version "1.7.0"
+    id("com.github.gmazzo.buildconfig") version "3.1.0"
+    id("org.beryx.jlink") version "2.25.0"
 }
 
 repositories {
     mavenCentral()
-    jcenter()
     maven { setUrl("https://oss.sonatype.org/content/repositories/snapshots/") }
     maven { setUrl("https://jitpack.io") }
 }
 
 java {
     modularity.inferModulePath.set(true)
-    sourceCompatibility = JavaVersion.VERSION_11
-    targetCompatibility = JavaVersion.VERSION_11
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
 }
 
 group = "quanserds"
@@ -41,12 +40,16 @@ tasks.test {
 
 tasks.withType<KotlinCompile> {
     kotlinOptions {
-        jvmTarget = "11"
+        jvmTarget = "17"
     }
 }
 
+tasks.compileJava {
+    options.isIncremental = false
+}
+
 tasks.compileKotlin {
-    destinationDir = tasks.compileJava.get().destinationDir
+    destinationDirectory.set(tasks.compileJava.get().destinationDirectory)
 }
 
 tasks.jar {
@@ -62,7 +65,7 @@ fun javafxOS(): String {
 }
 
 val javafxPlatform = javafxOS()
-val javafxVersion = "15.0.1"
+val javafxVersion = "18.0.1"
 
 fun javafxModule(name: String): String =
     "org.openjfx:javafx-$name:$javafxVersion:$javafxPlatform"
@@ -73,12 +76,12 @@ dependencies {
     implementation(javafxModule("controls"))
     implementation(javafxModule("fxml"))
 
-    implementation("org.kordamp.ikonli:ikonli-javafx:12.0.0")
-    implementation("org.kordamp.ikonli:ikonli-materialdesign2-pack:12.0.0")
+    implementation("org.kordamp.ikonli:ikonli-javafx:12.3.1")
+    implementation("org.kordamp.ikonli:ikonli-materialdesign2-pack:12.3.1")
 
-    testImplementation("org.junit.jupiter:junit-jupiter-api:5.7.0")
-    testImplementation("org.junit.jupiter:junit-jupiter-engine:5.7.0")
-    testImplementation("org.junit.platform:junit-platform-launcher:1.7.0")
+    testImplementation("org.junit.jupiter:junit-jupiter-api:5.8.2")
+    testImplementation("org.junit.jupiter:junit-jupiter-engine:5.8.2")
+    testImplementation("org.junit.platform:junit-platform-launcher:1.8.2")
 }
 
 jlink {
